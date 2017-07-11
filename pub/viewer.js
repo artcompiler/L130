@@ -126,6 +126,11 @@ exports.reserveCodeRange = reserveCodeRange;
 },{}],2:[function(require,module,exports){
 "use strict";
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* Copyright (c) 2016, Art Compiler LLC */
+
+
 var _assert = require("./assert");
 
 var _react = require("react");
@@ -142,58 +147,747 @@ window.gcexports.viewer = function () {
   function capture(el) {
     return null;
   }
+  function loadScript(src, resume) {
+    var script = document.createElement("script");
+    script.onload = resume;
+    script.src = src;
+    script.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  }
+  function loadStyle(src, resume) {
+    var link = document.createElement("link");
+    link.onload = resume;
+    link.href = src;
+    link.rel = "stylesheet";
+    document.getElementsByTagName("head")[0].appendChild(link);
+  }
+  function render(nodes, props) {
+    var _this = this;
+
+    var elts = [];
+    if (!(nodes instanceof Array)) {
+      // HACK not all arguments are arrays. Not sure they should be.
+      nodes = [nodes];
+    }
+    nodes.forEach(function (n, i) {
+      var args = [];
+      if (n.args) {
+        args = render.call(_this, n.args, props);
+      }
+      if ((typeof n === "undefined" ? "undefined" : _typeof(n)) === "object") {
+        n.style = n.style ? n.style : {};
+      }
+      switch (n.type) {
+        case "grid":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "container", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "table":
+          elts.push(React.createElement(
+            "table",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "thead":
+          elts.push(React.createElement(
+            "thead",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "tbody":
+          elts.push(React.createElement(
+            "tbody",
+            _extends({ className: "container", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "tr":
+          elts.push(React.createElement(
+            "tr",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "th":
+          elts.push(React.createElement(
+            "th",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "td":
+          elts.push(React.createElement(
+            "td",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "row":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "row", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "oneColumn":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "one column", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "twoColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "two columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "threeColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "three columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "fourColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "four columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "fiveColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "five columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "sixColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "six columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "sevenColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "seven columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "eightColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "eight columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "nineColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "nine columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "tenColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "ten columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "elevenColumns":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "eleven columns", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "twelveColumns":
+          if (n.id === "math") {
+            elts.push(React.createElement(
+              "div",
+              _extends({ className: "twelve columns", key: i, style: n.style }, n.attrs),
+              React.createElement(ProblemViewer, props)
+            ));
+          } else {
+            elts.push(React.createElement(
+              "div",
+              _extends({ className: "twelve columns", key: i, style: n.style }, n.attrs),
+              args
+            ));
+          }
+          break;
+        case "oneThirdColumn":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "one-third column", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "twoThirdsColumn":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "two-thirds column", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "oneHalfColumn":
+          elts.push(React.createElement(
+            "div",
+            _extends({ className: "one-half column", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "h1":
+          elts.push(React.createElement(
+            "h1",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "h2":
+          elts.push(React.createElement(
+            "h2",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "h3":
+          elts.push(React.createElement(
+            "h3",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "h4":
+          if (n.attrs.id === "title" && props.obj.title) {
+            elts.push(React.createElement(
+              "h4",
+              _extends({ key: i, style: n.style }, n.attrs),
+              splitValue(props.obj.title)
+            ));
+          } else {
+            elts.push(React.createElement(
+              "h4",
+              _extends({ key: i, style: n.style }, n.attrs),
+              args
+            ));
+          }
+          break;
+        case "h5":
+          elts.push(React.createElement(
+            "h5",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "h6":
+          if (n.attrs.id === "notes" && props.obj.notes) {
+            elts.push(React.createElement(
+              "h6",
+              _extends({ key: i, style: n.style }, n.attrs),
+              splitValue(props.obj.notes)
+            ));
+          } else {
+            elts.push(React.createElement(
+              "h6",
+              _extends({ key: i, style: n.style }, n.attrs),
+              args
+            ));
+          }
+          break;
+        case "br":
+          elts.push(React.createElement("br", null));
+          break;
+        case "code":
+          n.style.fontSize = n.style && n.style.fontSize ? n.style.fontSize : "90%";
+          elts.push(React.createElement(
+            "pre",
+            _extends({ key: i, style: n.style }, n.attrs),
+            React.createElement(
+              "code",
+              null,
+              args
+            )
+          ));
+          break;
+        case "cspan":
+          elts.push(React.createElement(
+            "code",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "textarea":
+          if (n.attrs.id === "context" && props.obj.context) {
+            elts.push(React.createElement("textarea", _extends({ className: "u-full-width", key: i, rows: "2",
+              onBlur: onUpdate,
+              onChange: onChange,
+              style: n.style }, n.attrs)));
+          } else {
+            elts.push(React.createElement("textarea", _extends({ className: "u-full-width", key: i, rows: "1",
+              onBlur: onUpdate,
+              onChange: onChange,
+              style: n.style }, n.attrs)));
+          }
+          break;
+        case "button":
+          elts.push(React.createElement(
+            "button",
+            _extends({
+              key: i,
+              onClick: _this.clickHandler,
+              style: n.style
+            }, n.attrs),
+            args
+          ));
+          break;
+        case "ul":
+          elts.push(React.createElement(
+            "ul",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "ol":
+          elts.push(React.createElement(
+            "ol",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "li":
+          elts.push(React.createElement(
+            "li",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "img":
+          elts.push(React.createElement("img", _extends({ key: i, style: n.style }, n.attrs)));
+          break;
+        case "a":
+          elts.push(React.createElement(
+            "a",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "title":
+          document.title = n.value;
+          break;
+        case "graffito":
+          // elts.push(
+          //   <div key={i} style={{"position": "relative"}}>
+          //     <iframe style={n.style} {...n.attrs}/>
+          //     <a href={n.attrs.src} target="L116-CHILD" style={{
+          //       "position": "absolute",
+          //       "top": 0,
+          //       "left": 0,
+          //       "display": "inline-block",
+          //       "width": "100%",
+          //       "height": "100%",
+          //       "zIndex": 5}}></a>
+          //   </div>
+          // );
+          elts.push(React.createElement(
+            "div",
+            { key: i, style: { "position": "relative" } },
+            React.createElement("iframe", _extends({ style: n.style }, n.attrs))
+          ));
+          break;
+        case "str":
+          elts.push(React.createElement(
+            "span",
+            { className: "u-full-width", key: i, style: n.style },
+            "" + n.value
+          ));
+          break;
+        default:
+          // Not a node, so push the value.
+          elts.push(n);
+          break;
+      }
+    });
+    return elts;
+  }
+
+  var data = {
+    "flare": {
+      "analytics": {
+        "cluster": {
+          "AgglomerativeCluster": 3938,
+          "CommunityStructure": 3812,
+          "HierarchicalCluster": 6714,
+          "MergeEdge": 743
+        },
+        "graph": {
+          "BetweennessCentrality": 3534,
+          "LinkDistance": 5731,
+          "MaxFlowMinCut": 7840,
+          "ShortestPaths": 5914,
+          "SpanningTree": 3416
+        },
+        "optimization": {
+          "AspectRatioBanker": 7074
+        }
+      },
+      "animate": {
+        "Easing": 17010,
+        "FunctionSequence": 5842,
+        "interpolate": {
+          "ArrayInterpolator": 1983,
+          "ColorInterpolator": 2047,
+          "DateInterpolator": 1375,
+          "Interpolator": 8746,
+          "MatrixInterpolator": 2202,
+          "NumberInterpolator": 1382,
+          "ObjectInterpolator": 1629,
+          "PointInterpolator": 1675,
+          "RectangleInterpolator": 2042
+        },
+        "ISchedulable": 1041,
+        "Parallel": 5176,
+        "Pause": 449,
+        "Scheduler": 5593,
+        "Sequence": 5534,
+        "Transition": 9201,
+        "Transitioner": 19975,
+        "TransitionEvent": 1116,
+        "Tween": 6006
+      },
+      "data": {
+        "converters": {
+          "Converters": 721,
+          "DelimitedTextConverter": 4294,
+          "GraphMLConverter": 9800,
+          "IDataConverter": 1314,
+          "JSONConverter": 2220
+        },
+        "DataField": 1759,
+        "DataSchema": 2165,
+        "DataSet": 586,
+        "DataSource": 3331,
+        "DataTable": 772,
+        "DataUtil": 3322
+      },
+      "display": {
+        "DirtySprite": 8833,
+        "LineSprite": 1732,
+        "RectSprite": 3623,
+        "TextSprite": 10066
+      },
+      "flex": {
+        "FlareVis": 4116
+      },
+      "physics": {
+        "DragForce": 1082,
+        "GravityForce": 1336,
+        "IForce": 319,
+        "NBodyForce": 10498,
+        "Particle": 2822,
+        "Simulation": 9983,
+        "Spring": 2213,
+        "SpringForce": 1681
+      },
+      "query": {
+        "AggregateExpression": 1616,
+        "And": 1027,
+        "Arithmetic": 3891,
+        "Average": 891,
+        "BinaryExpression": 2893,
+        "Comparison": 5103,
+        "CompositeExpression": 3677,
+        "Count": 781,
+        "DateUtil": 4141,
+        "Distinct": 933,
+        "Expression": 5130,
+        "ExpressionIterator": 3617,
+        "Fn": 3240,
+        "If": 2732,
+        "IsA": 2039,
+        "Literal": 1214,
+        "Match": 3748,
+        "Maximum": 843,
+        "methods": {
+          "add": 593,
+          "and": 330,
+          "average": 287,
+          "count": 277,
+          "distinct": 292,
+          "div": 595,
+          "eq": 594,
+          "fn": 460,
+          "gt": 603,
+          "gte": 625,
+          "iff": 748,
+          "isa": 461,
+          "lt": 597,
+          "lte": 619,
+          "max": 283,
+          "min": 283,
+          "mod": 591,
+          "mul": 603,
+          "neq": 599,
+          "not": 386,
+          "or": 323,
+          "orderby": 307,
+          "range": 772,
+          "select": 296,
+          "stddev": 363,
+          "sub": 600,
+          "sum": 280,
+          "update": 307,
+          "variance": 335,
+          "where": 299,
+          "xor": 354,
+          "_": 264
+        },
+        "Minimum": 843,
+        "Not": 1554,
+        "Or": 970,
+        "Query": 13896,
+        "Range": 1594,
+        "StringUtil": 4130,
+        "Sum": 791,
+        "Variable": 1124,
+        "Variance": 1876,
+        "Xor": 1101
+      },
+      "scale": {
+        "IScaleMap": 2105,
+        "LinearScale": 1316,
+        "LogScale": 3151,
+        "OrdinalScale": 3770,
+        "QuantileScale": 2435,
+        "QuantitativeScale": 4839,
+        "RootScale": 1756,
+        "Scale": 4268,
+        "ScaleType": 1821,
+        "TimeScale": 5833
+      },
+      "util": {
+        "Arrays": 8258,
+        "Colors": 10001,
+        "Dates": 8217,
+        "Displays": 12555,
+        "Filter": 2324,
+        "Geometry": 10993,
+        "heap": {
+          "FibonacciHeap": 9354,
+          "HeapNode": 1233
+        },
+        "IEvaluable": 335,
+        "IPredicate": 383,
+        "IValueProxy": 874,
+        "math": {
+          "DenseMatrix": 3165,
+          "IMatrix": 2815,
+          "SparseMatrix": 3366
+        },
+        "Maths": 17705,
+        "Orientation": 1486,
+        "palette": {
+          "ColorPalette": 6367,
+          "Palette": 1229,
+          "ShapePalette": 2059,
+          "SizePalette": 2291
+        },
+        "Property": 5559,
+        "Shapes": 19118,
+        "Sort": 6887,
+        "Stats": 6557,
+        "Strings": 22026
+      },
+      "vis": {
+        "axis": {
+          "Axes": 1302,
+          "Axis": 24593,
+          "AxisGridLine": 652,
+          "AxisLabel": 636,
+          "CartesianAxes": 6703
+        },
+        "controls": {
+          "AnchorControl": 2138,
+          "ClickControl": 3824,
+          "Control": 1353,
+          "ControlList": 4665,
+          "DragControl": 2649,
+          "ExpandControl": 2832,
+          "HoverControl": 4896,
+          "IControl": 763,
+          "PanZoomControl": 5222,
+          "SelectionControl": 7862,
+          "TooltipControl": 8435
+        },
+        "data": {
+          "Data": 20544,
+          "DataList": 19788,
+          "DataSprite": 10349,
+          "EdgeSprite": 3301,
+          "NodeSprite": 19382,
+          "render": {
+            "ArrowType": 698,
+            "EdgeRenderer": 5569,
+            "IRenderer": 353,
+            "ShapeRenderer": 2247
+          },
+          "ScaleBinding": 11275,
+          "Tree": 7147,
+          "TreeBuilder": 9930
+        },
+        "events": {
+          "DataEvent": 2313,
+          "SelectionEvent": 1880,
+          "TooltipEvent": 1701,
+          "VisualizationEvent": 1117
+        },
+        "legend": {
+          "Legend": 20859,
+          "LegendItem": 4614,
+          "LegendRange": 10530
+        },
+        "operator": {
+          "distortion": {
+            "BifocalDistortion": 4461,
+            "Distortion": 6314,
+            "FisheyeDistortion": 3444
+          },
+          "encoder": {
+            "ColorEncoder": 3179,
+            "Encoder": 4060,
+            "PropertyEncoder": 4138,
+            "ShapeEncoder": 1690,
+            "SizeEncoder": 1830
+          },
+          "filter": {
+            "FisheyeTreeFilter": 5219,
+            "GraphDistanceFilter": 3165,
+            "VisibilityFilter": 3509
+          },
+          "IOperator": 1286,
+          "label": {
+            "Labeler": 9956,
+            "RadialLabeler": 3899,
+            "StackedAreaLabeler": 3202
+          },
+          "layout": {
+            "AxisLayout": 6725,
+            "BundledEdgeRouter": 3727,
+            "CircleLayout": 9317,
+            "CirclePackingLayout": 12003,
+            "DendrogramLayout": 4853,
+            "ForceDirectedLayout": 8411,
+            "IcicleTreeLayout": 4864,
+            "IndentedTreeLayout": 3174,
+            "Layout": 7881,
+            "NodeLinkTreeLayout": 12870,
+            "PieLayout": 2728,
+            "RadialTreeLayout": 12348,
+            "RandomLayout": 870,
+            "StackedAreaLayout": 9121,
+            "TreeMapLayout": 9191
+          },
+          "Operator": 2490,
+          "OperatorList": 5248,
+          "OperatorSequence": 4190,
+          "OperatorSwitch": 2581,
+          "SortOperator": 2023
+        },
+        "Visualization": 16540
+      }
+    }
+  };
 
   // Graffiticode looks for this React class named Viewer. The compiled code is
   // passed via props in the renderer.
   var Viewer = React.createClass({
     displayName: "Viewer",
-
     componentDidMount: function componentDidMount() {},
+    componentDidUpdate: function componentDidUpdate() {
+      var width = 960,
+          height = 500;
+
+      var x = d3.scaleLinear().range([0, width]);
+
+      var y = d3.scaleLinear().range([0, height]);
+
+      var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+      var partition = d3.partition().size([width, height]).padding(0).round(true);
+
+      var svg = d3.select(".container").append("svg").attr("width", width).attr("height", height);
+
+      var rect = svg.selectAll("rect");
+
+      var root = d3.hierarchy(d3.entries(data)[0], function (d) {
+        return d3.entries(d.value);
+      }).sum(function (d) {
+        return d.value;
+      }).sort(function (a, b) {
+        return b.value - a.value;
+      });
+
+      partition(root);
+
+      rect = rect.data(root.descendants()).enter().append("rect").attr("x", function (d) {
+        return d.x0;
+      }).attr("y", function (d) {
+        return d.y0;
+      }).attr("width", function (d) {
+        return d.x1 - d.x0;
+      }).attr("height", function (d) {
+        return d.y1 - d.y0;
+      }).attr("stroke", "#fff").attr("fill", function (d) {
+        return color((d.children ? d : d.parent).data.key);
+      }).on("click", clicked);
+
+      function clicked(d) {
+        x.domain([d.x0, d.x1]);
+        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+
+        rect.transition().duration(750).attr("x", function (d) {
+          return x(d.x0);
+        }).attr("y", function (d) {
+          return y(d.y0);
+        }).attr("width", function (d) {
+          return x(d.x1) - x(d.x0);
+        }).attr("height", function (d) {
+          return y(d.y1) - y(d.y0);
+        });
+      }
+    },
+
     render: function render() {
       // If you have nested components, make sure you send the props down to the
       // owned components.
       var props = this.props;
-      var obj = props.obj ? [].concat(props.obj) : [];
-      var elts = [];
-      obj.forEach(function (d, i) {
-        var style = {};
-        if (d.style) {
-          Object.keys(d.style).forEach(function (k) {
-            style[k] = d.style[k];
-          });
-        }
-        if (d.value === "$$timer$$") {
-          elts.push(React.createElement(
-            "span",
-            { key: i, style: style },
-            React.createElement(Timer, props)
-          ));
-        } else {
-          var val = d.value ? d.value : d;
-          if (val instanceof Array) {
-            val = val.join(" ");
-          } else if (typeof val !== "string" && typeof val !== "number" && typeof val !== "boolean") {
-            val = JSON.stringify(val);
-          }
-          elts.push(React.createElement(
-            "span",
-            { key: i, style: style },
-            val
-          ));
-        }
-      });
-      return elts.length > 0 ? React.createElement(
+      var elts = []; //render.call(this, this.ui, props, this.dirty);
+      return React.createElement(
         "div",
-        null,
-        elts
-      ) : React.createElement("div", null);
+        { className: "section" },
+        React.createElement(
+          "div",
+          { className: "container" },
+          elts
+        )
+      );
     }
   });
   return {
     capture: capture,
     Viewer: Viewer
   };
-}(); /* Copyright (c) 2016, Art Compiler LLC */
+}();
 },{"./assert":1,"d3":3,"react":160}],3:[function(require,module,exports){
 // https://d3js.org Version 4.7.1. Copyright 2017 Mike Bostock.
 (function (global, factory) {
