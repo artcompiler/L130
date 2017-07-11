@@ -689,8 +689,9 @@ window.gcexports.viewer = (function () {
       var color = d3.scaleOrdinal(d3.schemeCategory20c);
 
       var partition = d3.partition()
-        .size([width, height])
-        .padding(0)
+ //       .size([width, height])
+        .size([height, width])
+        .padding(1)
         .round(true);
 
       var svg = d3.select(".container").append("svg")
@@ -710,24 +711,34 @@ window.gcexports.viewer = (function () {
       rect = rect
         .data(root.descendants())
         .enter().append("rect")
-        .attr("x", function(d) { return d.x0; })
-        .attr("y", function(d) { return d.y0; })
-        .attr("width", function(d) { return d.x1 - d.x0; })
-        .attr("height", function(d) { return d.y1 - d.y0; })
+        // .attr("x", function(d) { return d.x0; })
+        // .attr("y", function(d) { return d.y0; })
+        .attr("y", function(d) { return d.x0; })
+        .attr("x", function(d) { return d.y0; })
+        // .attr("width", function(d) { return d.x1 - d.x0; })
+        // .attr("height", function(d) { return d.y1 - d.y0; })
+        .attr("height", function(d) { return d.x1 - d.x0; })
+        .attr("width", function(d) { return d.y1 - d.y0; })
         .attr("stroke", "#fff")
         .attr("fill", function(d) { return color((d.children ? d : d.parent).data.key); })
         .on("click", clicked);
 
       function clicked(d) {
-        x.domain([d.x0, d.x1]);
-        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        // x.domain([d.x0, d.x1]);
+        // y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        y.domain([d.x0, d.x1]);
+        x.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
 
         rect.transition()
           .duration(750)
-          .attr("x", function(d) { return x(d.x0); })
-          .attr("y", function(d) { return y(d.y0); })
-          .attr("width", function(d) { return x(d.x1) - x(d.x0); })
-          .attr("height", function(d) { return y(d.y1) - y(d.y0); });
+          // .attr("x", function(d) { return x(d.x0); })
+          // .attr("y", function(d) { return y(d.y0); })
+          // .attr("width", function(d) { return x(d.x1) - x(d.x0); })
+          // .attr("height", function(d) { return y(d.y1) - y(d.y0); });
+          .attr("y", function(d) { return x(d.x0); })
+          .attr("x", function(d) { return y(d.y0); })
+          .attr("height", function(d) { return x(d.x1) - x(d.x0); })
+          .attr("width", function(d) { return y(d.y1) - y(d.y0); });
       }
     },
     render: function () {
