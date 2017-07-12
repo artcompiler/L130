@@ -678,27 +678,19 @@ window.gcexports.viewer = (function () {
     },
     componentDidUpdate () {
       var width = 960,
-      height = 500;
-
+          height = 500;
       var x = d3.scaleLinear()
         .range([0, width]);
-
       var y = d3.scaleLinear()
         .range([0, height]);
-
       var color = d3.scaleOrdinal(d3.schemeCategory20c);
-
       var partition = d3.partition()
- //       .size([width, height])
-        .size([height, width])
-        .padding(1)
+        .size([width, height])
+        .padding(0)
         .round(true);
-
       var svg = d3.select(".container").append("svg")
         .attr("width", width)
         .attr("height", height);
-
-      var rect = svg.selectAll("rect");
 
       let root = d3.hierarchy(d3.entries(data)[0], function(d) {
           return d3.entries(d.value)
@@ -708,37 +700,41 @@ window.gcexports.viewer = (function () {
 
       partition(root);
 
-      rect = rect
+      let rect =
+        svg.selectAll("rect")
+        // svg.selectAll("image")
         .data(root.descendants())
         .enter().append("rect")
-        // .attr("x", function(d) { return d.x0; })
-        // .attr("y", function(d) { return d.y0; })
-        .attr("y", function(d) { return d.x0; })
-        .attr("x", function(d) { return d.y0; })
-        // .attr("width", function(d) { return d.x1 - d.x0; })
-        // .attr("height", function(d) { return d.y1 - d.y0; })
-        .attr("height", function(d) { return d.x1 - d.x0; })
-        .attr("width", function(d) { return d.y1 - d.y0; })
+        // .enter().append("image")
+        .attr("x", function(d) { return d.x0; })
+        .attr("y", function(d) { return d.y0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .attr("height", function(d) { return d.y1 - d.y0; })
         .attr("stroke", "#fff")
         .attr("fill", function(d) { return color((d.children ? d : d.parent).data.key); })
+        // .attr("href", (d) => {
+        //   let href = "data:image/svg+xml;utf8," +
+        //     "<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>" +
+        //     "<rect width='100%' height='100%' stroke='#fff' " +
+        //           "fill='" + color((d.children ? d : d.parent).data.key) +
+        //     "'/>" +
+        //     "</svg>"
+        //   return href;
+        // })
         .on("click", clicked);
 
-      function clicked(d) {
-        // x.domain([d.x0, d.x1]);
-        // y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
-        y.domain([d.x0, d.x1]);
-        x.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+      rect.exit();
 
-        rect.transition()
-          .duration(750)
-          // .attr("x", function(d) { return x(d.x0); })
-          // .attr("y", function(d) { return y(d.y0); })
-          // .attr("width", function(d) { return x(d.x1) - x(d.x0); })
-          // .attr("height", function(d) { return y(d.y1) - y(d.y0); });
-          .attr("y", function(d) { return x(d.x0); })
-          .attr("x", function(d) { return y(d.y0); })
-          .attr("height", function(d) { return x(d.x1) - x(d.x0); })
-          .attr("width", function(d) { return y(d.y1) - y(d.y0); });
+      function clicked(d) {
+        x.domain([d.x0, d.x1]);
+        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        rect
+          .transition()
+          .duration(250)
+          .attr("x", function(d) { return x(d.x0); })
+          .attr("y", function(d) { return y(d.y0); })
+          .attr("width", function(d) { return x(d.x1) - x(d.x0); })
+          .attr("height", function(d) { return y(d.y1) - y(d.y0); });
       }
     },
     render: function () {
