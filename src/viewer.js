@@ -233,7 +233,7 @@ window.gcexports.viewer = (function () {
               <h4 key={i} style={n.style} {...n.attrs}>
               {splitValue(props.obj.title)}
             </h4>
-          );          
+          );
         } else {
           elts.push(
               <h4 key={i} style={n.style} {...n.attrs}>
@@ -700,35 +700,48 @@ window.gcexports.viewer = (function () {
 
       partition(root);
 
-      let rect =
-        svg.selectAll("rect")
-        // svg.selectAll("image")
+      let cell =
+        svg.selectAll(".node")
         .data(root.descendants())
-        .enter().append("rect")
-        // .enter().append("image")
+        .enter().append("g")
+        .attr("class", "node");
+
+      cell.append("rect")
         .attr("x", function(d) { return d.x0; })
         .attr("y", function(d) { return d.y0; })
         .attr("width", function(d) { return d.x1 - d.x0; })
         .attr("height", function(d) { return d.y1 - d.y0; })
         .attr("stroke", "#fff")
         .attr("fill", function(d) { return color((d.children ? d : d.parent).data.key); })
-        // .attr("href", (d) => {
-        //   let href = "data:image/svg+xml;utf8," +
-        //     "<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>" +
-        //     "<rect width='100%' height='100%' stroke='#fff' " +
-        //           "fill='" + color((d.children ? d : d.parent).data.key) +
-        //     "'/>" +
-        //     "</svg>"
-        //   return href;
-        // })
         .on("click", clicked);
 
-      rect.exit();
+      cell.append("image")
+        .attr("x", function(d) { return d.x0; })
+        .attr("y", function(d) { return d.y0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .attr("height", function(d) { return d.y1 - d.y0; })
+        .attr("href", (d) => {
+          let href = "data:image/svg+xml;utf8," +
+            "<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>" +
+            "<rect width='100%' height='100%' stroke='#fff' " +
+                  "fill='" + color((d.children ? d : d.parent).data.key) +
+            "'/>" +
+            "</svg>"
+          return href;
+        })
+        .on("click", clicked);
 
       function clicked(d) {
         x.domain([d.x0, d.x1]);
         y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
-        rect
+        cell.selectAll("rect")
+          .transition()
+          .duration(250)
+          .attr("x", function(d) { return x(d.x0); })
+          .attr("y", function(d) { return y(d.y0); })
+          .attr("width", function(d) { return x(d.x1) - x(d.x0); })
+          .attr("height", function(d) { return y(d.y1) - y(d.y0); });
+        cell.selectAll("image")
           .transition()
           .duration(250)
           .attr("x", function(d) { return x(d.x0); })
