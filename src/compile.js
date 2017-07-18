@@ -381,57 +381,60 @@ let render = (function() {
     // Do some rendering here.
 //    resume([], data);
     mapList(Object.keys(val), (key, resume) => { 
+      console.log("[1] render() key=" + key);
       let v = val[key];
       if (v.index) {
         console.log("render() v.index=" + JSON.stringify(v.index));
         fn(v.index, data => {
-          console.log("render() data=" + JSON.stringify(data));
+          console.log("[1] render() data=" + JSON.stringify(data, null, 2));
         });
       }
     }, resume);
     function fn (obj, resume) {
-      mapList(Object.keys(obj), (key, resume) => {
-        let val = obj[key];
-        // Render all keys to SVG.
-        if (typeof val !== "object") {
-          // Leaf node, so just need a numeric value.
-          resume(val);
-        } else if (val instanceof Array) {
-          resume({});
-        } else {
+      if (typeof obj !== "object") {
+        resume(obj);
+      } else {
+        let svgObj = {};
+        mapList(Object.keys(obj), (key, resume) => {
+          let val = obj[key];
+          console.log("[2] render() key=" + key + " val=" + JSON.stringify(val, null, 2));
+          // Render all keys to SVG.
+          assert(!(val instanceof Array));
           mapList(Object.keys(val), (key, resume) => {
-            console.log("render() key=" + key);
-            tex2SVG(key, (err, keySVG) => {
-              fn(val[key], data => {
-                console.log("render() data=" + JSON.stringify(data));
-                resume([], keySVG);
-              })
+            let val2 = val[key];
+            console.log("[3] render() key=" + key + " val2=" + JSON.stringify(val2, null, 2));
+            tex2SVG(key, (err, svgKey) => {
+              fn(val2, data => {
+                svgObj[svgKey] = data;
+                console.log("[3] render() data=" + JSON.stringify(svgObj, null, 2));
+                resume(svgObj);
+              });
             });
           }, resume);
-        }
-      }, resume);
+        }, resume);
+      }
     }
     function mapList(lst, fn, resume) {
       if (lst && lst.length > 1) {
-        fn(lst[0], (err1, val1) => {
-          mapList(lst.slice(1), fn, (err2, val2) => {
+        fn(lst[0], val1 => {
+          mapList(lst.slice(1), fn, val2 => {
             let val = [].concat(val2);
             if (val1 !== null) {
               val.unshift(val1);
             }
-            resume([].concat(err1).concat(err2), val);
+            resume(val);
           });
         });
       } else if (lst && lst.length > 0) {
-        fn(lst[0], (err1, val1) => {
+        fn(lst[0], val1 => {
           let val = [];
           if (val1 !== null) {
             val.push(val1);
           }
-          resume([].concat(err1), val);
+          resume(val);
         });
       } else {
-        resume([], []);
+        resume([]);
       }
     }
   }
