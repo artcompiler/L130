@@ -351,57 +351,54 @@ mjAPI.config({
   }
 });
 mjAPI.start();
+function escapeXML(str) {
+  return String(str)
+    .replace(/&(?!\w+;)/g, "&amp;")
+    .replace(/\n/g, " ")
+    .replace(/\\/g, "\\\\")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function tex2SVG(str, resume) {
+  mjAPI.typeset({
+    math: str,
+    format: "inline-TeX",
+    svg: true,
+    ex: 6,
+    width: 60,
+    linebreaks: true,
+  }, function (data) {
+    if (!data.errors) {
+      resume(null, data.svg);
+    } else {
+      resume(null, "");
+    }
+  });
+}
 let render = (function() {
-  function tex2SVG(str, resume) {
-    mjAPI.typeset({
-      math: str,
-      format: "inline-TeX",
-      svg: true,
-      ex: 6,
-      width: 60,
-      linebreaks: true,
-    }, function (data) {
-      if (!data.errors) {
-        resume(null, data.svg);
-      } else {
-        resume(null, "");
-      }
-    });
-  }
-  function escapeXML(str) {
-    return String(str)
-      .replace(/&(?!\w+;)/g, "&amp;")
-      .replace(/\n/g, " ")
-      .replace(/\\/g, "\\\\")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
   function render(val, resume) {
     // Do some rendering here.
-//    resume([], data);
-    mapList(Object.keys(val), (key, resume) => { 
-      console.log("[1] render() key=" + key);
+    mapListToObject(Object.keys(val), (key, resume) => { 
       let v = val[key];
       if (v.index) {
-        console.log("render() v.index=" + JSON.stringify(v.index));
         fn(v.index, data => {
-          console.log("[1] render() data=" + JSON.stringify(data, null, 2));
+          resume(data);
         });
+      } else {
+        resume({});
       }
     }, resume);
     function fn (obj, resume) {
       if (typeof obj !== "object") {
-        resume(obj);
+        resume(1);
       } else {
         let svgObj = {};
-        mapList(Object.keys(obj), (key, resume) => {
+        mapListToObject(Object.keys(obj), (key, resume) => {
           let val = obj[key];
-          console.log("[2] render() key=" + key + " val=" + JSON.stringify(val, null, 2));
           tex2SVG(key, (err, svgKey) => {
             fn(val, data => {
-              svgObj[svgKey] = data;
-              console.log("[2] render() data=" + JSON.stringify(svgObj, null, 2));
+              svgObj[escapeXML(svgKey)] = data;
               resume(svgObj);
             });
           });
@@ -411,8 +408,8 @@ let render = (function() {
     function mapList(lst, fn, resume) {
       if (lst && lst.length > 1) {
         fn(lst[0], val1 => {
-          mapList(lst.slice(1), fn, val2 => {
-            let val = [].concat(val2);
+          mapList(lst.slice(1), fn, function (val2) {
+            var val = [].concat(val2);
             if (val1 !== null) {
               val.unshift(val1);
             }
@@ -431,6 +428,57 @@ let render = (function() {
         resume([]);
       }
     }
+    function merge(o1, o2) {
+      console.log("merge() o1=" + JSON.stringify(o1, null, 2));
+      console.log("merge() o2=" + JSON.stringify(o2, null, 2));
+      let obj = {};
+      if (o1 && o2 &&
+          typeof o1 === "object" &&
+          typeof o2 === "object") {
+        Object.keys(o1).forEach(k => {
+          // Merge properties in o1.
+          if (typeof o1[k] === "object" && typeof o2[k] === "object") {
+            obj[k] = merge(o1[k], o2[k]);
+          } else {
+            obj[k] = o1[k];
+          }
+        });
+        Object.keys(o2).forEach(k => {
+          // Now add the o2 only properties.
+          if (!obj[k]) {
+            obj[k] = o2[k];
+          }
+        });
+      } else if (o1 && typeof o1 === "object") {
+        Object.keys(o2).forEach(k => {
+          obj[k] = o1[k];
+        });
+      } else if (o2 && typeof o2 === "object") {
+        Object.keys(o2).forEach(k => {
+          obj[k] = o2[k];
+        });
+      }
+      console.log("merge() obj=" + JSON.stringify(obj, null, 2));
+      return obj;
+    }
+    function mapListToObject(lst, fn, resume) {
+      if (lst && lst.length > 1) {
+        fn(lst[0], val1 => {
+          mapListToObject(lst.slice(1), fn, val2 => {
+            if (val1 !== null) {
+              val2 = merge(val1, val2);
+            }
+            resume(val2);
+          });
+        });
+      } else if (lst && lst.length > 0) {
+        fn(lst[0], val1 => {
+          resume(val1);
+        });
+      } else {
+        resume({});
+      }
+    }
   }
   return render;
 })();
@@ -447,8 +495,13 @@ export let compiler = (function () {
         if (err.length) {
           resume(err, val);
         } else {
-          render(val, function (err, val) {
-            resume(err, val);
+          render(val, function (val) {
+            console.log("compile() val=" + JSON.stringify(val, null, 2));
+            tex2SVG("\\text{root}", (e, svg) => {
+              let root = {};
+              root[escapeXML(svg)] = val;
+              resume(err, root);
+            });
           });
         }
       });
