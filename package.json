@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "express": "^4.0.x",
-    "domready": "^1.0.8"
+    "domready": "^1.0.8",
+    "mathjax-node": "0.5.2"
   },
   "engines": {
     "node": "latest"
