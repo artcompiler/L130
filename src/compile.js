@@ -398,19 +398,13 @@ let render = (function() {
         mapList(Object.keys(obj), (key, resume) => {
           let val = obj[key];
           console.log("[2] render() key=" + key + " val=" + JSON.stringify(val, null, 2));
-          // Render all keys to SVG.
-          assert(!(val instanceof Array));
-          mapList(Object.keys(val), (key, resume) => {
-            let val2 = val[key];
-            console.log("[3] render() key=" + key + " val2=" + JSON.stringify(val2, null, 2));
-            tex2SVG(key, (err, svgKey) => {
-              fn(val2, data => {
-                svgObj[svgKey] = data;
-                console.log("[3] render() data=" + JSON.stringify(svgObj, null, 2));
-                resume(svgObj);
-              });
+          tex2SVG(key, (err, svgKey) => {
+            fn(val, data => {
+              svgObj[svgKey] = data;
+              console.log("[2] render() data=" + JSON.stringify(svgObj, null, 2));
+              resume(svgObj);
             });
-          }, resume);
+          });
         }, resume);
       }
     }
