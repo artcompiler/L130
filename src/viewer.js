@@ -410,8 +410,12 @@ window.gcexports.viewer = (function () {
       let root = d3.hierarchy(d3.entries(data)[0], (d) => {
           return d3.entries(d.value)
         })
-        .sum(function(d) { return d.value })
-        .sort(function(a, b) { return b.value - a.value; });
+        .sum(function(d) {
+          return typeof d.value === "object" ?d.value : 1;
+        })
+        .sort(function(a, b) {
+          return b.value - a.value;
+        });
 
       partition(root);
 
@@ -428,18 +432,22 @@ window.gcexports.viewer = (function () {
         .attr("height", function(d) { return d.y1 - d.y0; })
         .attr("stroke", "#fff")
         .attr("fill", (d) => { return "#B0C4DE"; })
-//        .attr("fill", (d) => {color((d.children ? d : d.parent).data.key); })
         .on("click", clicked);
 
       let size = 10;
       cell.append("image")
         .attr("x", function(d) { return d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2; })
         .attr("y", function(d) { return d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2; })
-        .attr("width", function(d) { return getWidth(d.data.key) })
+        .attr("width", function(d) {
+          return getWidth(d.data.key)
+        })
         .attr("height", function(d) { return getHeight(d.data.key); })
         .attr("href", (d) => {
           let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
           return href;
+        })
+        .style("opacity", function(d) {
+          return getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0;
         })
         .on("click", clicked);
 
@@ -480,20 +488,34 @@ window.gcexports.viewer = (function () {
       }
 
       function clicked(d) {
-        x.domain([d.x0, d.x1]);
-        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
-        cell.selectAll("rect")
-          .transition()
-          .duration(250)
-          .attr("x", function(d) { return x(d.x0); })
-          .attr("y", function(d) { return y(d.y0); })
-          .attr("width", function(d) { return x(d.x1) - x(d.x0); })
-          .attr("height", function(d) { return y(d.y1) - y(d.y0); });
-        cell.selectAll("image")
-          .transition()
-          .duration(250)
-          .attr("x", function(d) { return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2; })
-          .attr("y", function(d) { return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2; })
+        if (typeof d.data.value !== "object") {
+          window.open("/form?id=" + d.data.value, "/lang?id=122");
+        } else {
+          x.domain([d.x0, d.x1]);
+          y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+          cell.selectAll("rect")
+            .transition()
+            .duration(250)
+            .attr("x", function(d) { return x(d.x0); })
+            .attr("y", function(d) { return y(d.y0); })
+            .attr("width", function(d) { return x(d.x1) - x(d.x0); })
+            .attr("height", function(d) { return y(d.y1) - y(d.y0); });
+          cell.selectAll("image")
+            .transition()
+            .duration(250)
+            .attr("x", function(d) {
+              return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
+            })
+            .attr("y", function(d) {
+              return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
+            })
+            .style("opacity", function(d) {
+              return (
+                getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
+                  getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1
+              );
+            })
+        }
       }
     },
     render: function () {

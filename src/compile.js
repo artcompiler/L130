@@ -381,6 +381,7 @@ let render = (function() {
     // Do some rendering here.
     mapListToObject(Object.keys(val), (key, resume) => { 
       let v = val[key];
+      let itemID = v.id;
       if (v.index) {
         fn(v.index, data => {
           resume(data);
@@ -388,23 +389,23 @@ let render = (function() {
       } else {
         resume({});
       }
-    }, resume);
-    function fn (obj, resume) {
-      if (typeof obj !== "object") {
-        resume(1);
-      } else {
-        let svgObj = {};
-        mapListToObject(Object.keys(obj), (key, resume) => {
-          let val = obj[key];
-          tex2SVG(key, (err, svgKey) => {
-            fn(val, data => {
-              svgObj[escapeXML(svgKey)] = data;
-              resume(svgObj);
+      function fn (obj, resume) {
+        if (typeof obj !== "object") {
+          resume(itemID);
+        } else {
+          let svgObj = {};
+          mapListToObject(Object.keys(obj), (key, resume) => {
+            let val = obj[key];
+            tex2SVG(key, (err, svgKey) => {
+              fn(val, data => {
+                svgObj[escapeXML(svgKey)] = data;
+                resume(svgObj);
+              });
             });
-          });
-        }, resume);
+          }, resume);
+        }
       }
-    }
+    }, resume);
     function mapList(lst, fn, resume) {
       if (lst && lst.length > 1) {
         fn(lst[0], val1 => {
@@ -429,8 +430,6 @@ let render = (function() {
       }
     }
     function merge(o1, o2) {
-      console.log("merge() o1=" + JSON.stringify(o1, null, 2));
-      console.log("merge() o2=" + JSON.stringify(o2, null, 2));
       let obj = {};
       if (o1 && o2 &&
           typeof o1 === "object" &&
@@ -458,7 +457,6 @@ let render = (function() {
           obj[k] = o2[k];
         });
       }
-      console.log("merge() obj=" + JSON.stringify(obj, null, 2));
       return obj;
     }
     function mapListToObject(lst, fn, resume) {
@@ -496,7 +494,6 @@ export let compiler = (function () {
           resume(err, val);
         } else {
           render(val, function (val) {
-            console.log("compile() val=" + JSON.stringify(val, null, 2));
             tex2SVG("\\text{root}", (e, svg) => {
               let root = {};
               root[escapeXML(svg)] = val;

@@ -540,7 +540,7 @@ window.gcexports.viewer = function () {
       var root = d3.hierarchy(d3.entries(data)[0], function (d) {
         return d3.entries(d.value);
       }).sum(function (d) {
-        return d.value;
+        return _typeof(d.value) === "object" ? d.value : 1;
       }).sort(function (a, b) {
         return b.value - a.value;
       });
@@ -559,9 +559,7 @@ window.gcexports.viewer = function () {
         return d.y1 - d.y0;
       }).attr("stroke", "#fff").attr("fill", function (d) {
         return "#B0C4DE";
-      })
-      //        .attr("fill", (d) => {color((d.children ? d : d.parent).data.key); })
-      .on("click", clicked);
+      }).on("click", clicked);
 
       var size = 10;
       cell.append("image").attr("x", function (d) {
@@ -575,6 +573,8 @@ window.gcexports.viewer = function () {
       }).attr("href", function (d) {
         var href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
         return href;
+      }).style("opacity", function (d) {
+        return getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0;
       }).on("click", clicked);
 
       function getWidth(str) {
@@ -610,22 +610,28 @@ window.gcexports.viewer = function () {
       }
 
       function clicked(d) {
-        x.domain([d.x0, d.x1]);
-        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
-        cell.selectAll("rect").transition().duration(250).attr("x", function (d) {
-          return x(d.x0);
-        }).attr("y", function (d) {
-          return y(d.y0);
-        }).attr("width", function (d) {
-          return x(d.x1) - x(d.x0);
-        }).attr("height", function (d) {
-          return y(d.y1) - y(d.y0);
-        });
-        cell.selectAll("image").transition().duration(250).attr("x", function (d) {
-          return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
-        }).attr("y", function (d) {
-          return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
-        });
+        if (_typeof(d.data.value) !== "object") {
+          window.open("/form?id=" + d.data.value, "/lang?id=122");
+        } else {
+          x.domain([d.x0, d.x1]);
+          y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+          cell.selectAll("rect").transition().duration(250).attr("x", function (d) {
+            return x(d.x0);
+          }).attr("y", function (d) {
+            return y(d.y0);
+          }).attr("width", function (d) {
+            return x(d.x1) - x(d.x0);
+          }).attr("height", function (d) {
+            return y(d.y1) - y(d.y0);
+          });
+          cell.selectAll("image").transition().duration(250).attr("x", function (d) {
+            return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
+          }).attr("y", function (d) {
+            return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
+          }).style("opacity", function (d) {
+            return getWidth(d.data.key) > x(d.x1) - x(d.x0) || getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1;
+          });
+        }
       }
     },
 
