@@ -9,6 +9,7 @@ window.gcexports.globalLexicon = {
     "style" : { "tk": 1, "name": "STYLE", "cls": "function", "length": 2, "arity": 2 },
     "map" : { "tk": 1, "name": "MAP", "cls": "function", "length": 2, "arity": 2 },
     "apply" : { "tk": 1, "name": "APPLY", "cls": "function", "length": 2, "arity": 2 },
-    "in" : { "tk": 1, "name": "IN", "cls": "function", "length": 0, "arity": 0 },
+    "icicle" : { "tk": 1, "name": "ICICLE", "cls": "function", "length": 0, "arity": 0 },
+    "label" : { "tk": 1, "name": "LABEL", "cls": "function", "length": 2, "arity": 2 },
     "arg" : { "tk": 1, "name": "ARG", "cls": "function", "length": 1, "arity": 1 }
 }

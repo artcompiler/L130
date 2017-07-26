@@ -538,9 +538,9 @@ window.gcexports.viewer = function () {
       var data = this.props.obj;
 
       var root = d3.hierarchy(d3.entries(data)[0], function (d) {
-        return d3.entries(d.value);
+        return d3.entries(d.value.id ? d.value.id : d.value);
       }).sum(function (d) {
-        return _typeof(d.value) === "object" ? d.value : 1;
+        return d.value.id === undefined ? d.value : 1;
       }).sort(function (a, b) {
         return b.value - a.value;
       });
@@ -560,6 +560,10 @@ window.gcexports.viewer = function () {
       }).attr("stroke", "#fff").attr("fill", function (d) {
         return "#B0C4DE";
       }).on("click", clicked);
+
+      cell.append("title").text(function (d) {
+        return d.data.value.title ? d.data.value.title : "";
+      });
 
       var size = 10;
       cell.append("image").attr("x", function (d) {
@@ -610,8 +614,9 @@ window.gcexports.viewer = function () {
       }
 
       function clicked(d) {
-        if (_typeof(d.data.value) !== "object") {
-          window.open("/item?id=0+" + d.data.value + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
+        if (d.data.value.id !== undefined) {
+          // We have a leaf node.
+          window.open("/item?id=0+" + d.data.value.id + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
         } else {
           x.domain([d.x0, d.x1]);
           y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);

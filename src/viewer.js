@@ -408,10 +408,10 @@ window.gcexports.viewer = (function () {
       let data = this.props.obj;
 
       let root = d3.hierarchy(d3.entries(data)[0], (d) => {
-          return d3.entries(d.value)
+          return d3.entries(d.value.id ? d.value.id : d.value)
         })
         .sum(function(d) {
-          return typeof d.value === "object" ?d.value : 1;
+          return d.value.id === undefined ? d.value : 1;
         })
         .sort(function(a, b) {
           return b.value - a.value;
@@ -434,6 +434,11 @@ window.gcexports.viewer = (function () {
         .attr("fill", (d) => { return "#B0C4DE"; })
         .on("click", clicked);
 
+      cell.append("title")
+        .text(d => {
+          return d.data.value.title ? d.data.value.title : "";
+        });
+
       let size = 10;
       cell.append("image")
         .attr("x", function(d) { return d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2; })
@@ -450,6 +455,7 @@ window.gcexports.viewer = (function () {
           return getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0;
         })
         .on("click", clicked);
+
 
       function getWidth(str) {
         var EX = 6; // px
@@ -488,8 +494,9 @@ window.gcexports.viewer = (function () {
       }
 
       function clicked(d) {
-        if (typeof d.data.value !== "object") {
-          window.open("/item?id=0+" + d.data.value + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
+        if (d.data.value.id !== undefined) {
+          // We have a leaf node.
+          window.open("/item?id=0+" + d.data.value.id + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
         } else {
           x.domain([d.x0, d.x1]);
           y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
