@@ -48,6 +48,8 @@ let transform = (function() {
     "LAMBDA" : lambda,
     "PAREN" : paren,
     "APPLY" : apply,
+    "ICICLE" : icicle,
+    "LABEL" : label,
     "MAP" : map,
   }];
   let nodePool;
@@ -137,9 +139,19 @@ let transform = (function() {
       resume([], []);
     }
   }
-  function inData(node, options, resume) {
-    let data = options.data ? options.data : [];
-    resume([], data);
+  function icicle(node, options, resume) {
+    resume([], {
+      type: icicle,
+    });
+  }
+  function label(node, options, resume) {
+    // Return a function value.
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        val2.label = val1;
+        resume([].concat(err1).concat(err2), val2);
+      });
+    });
   }
   function arg(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
