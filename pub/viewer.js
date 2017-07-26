@@ -526,9 +526,6 @@ window.gcexports.viewer = function () {
   var Viewer = React.createClass({
     displayName: "Viewer",
     componentDidMount: function componentDidMount() {
-      this.componentDidUpdate();
-    },
-    componentDidUpdate: function componentDidUpdate() {
       var width = 960,
           height = 500;
       var x = d3.scaleLinear().range([0, width]);
