@@ -525,7 +525,9 @@ window.gcexports.viewer = function () {
   // passed via props in the renderer.
   var Viewer = React.createClass({
     displayName: "Viewer",
-    componentDidMount: function componentDidMount() {},
+    componentDidMount: function componentDidMount() {
+      this.componentDidUpdate();
+    },
     componentDidUpdate: function componentDidUpdate() {
       var width = 960,
           height = 500;
