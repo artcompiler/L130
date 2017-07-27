@@ -509,7 +509,7 @@ export let compiler = (function () {
           resume(err, val);
         } else {
           render(val, function (val) {
-            tex2SVG("\\text{root}", (e, svg) => {
+            tex2SVG("\\ldots", (e, svg) => {
               let root = {};
               root[escapeXML(svg)] = val;
               resume(err, root);
