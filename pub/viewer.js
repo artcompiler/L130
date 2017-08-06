@@ -614,8 +614,20 @@ window.gcexports.viewer = function () {
 
       function clicked(d) {
         if (d.data.value.id !== undefined) {
+          window.gcexports.dispatcher.dispatch({
+            "L100": {
+              data: {
+                "generator": {
+                  langID: "122",
+                  codeID: d.data.value.id,
+                  dataID: "0"
+                }
+              },
+              recompileCode: true
+            }
+          });
           // We have a leaf node.
-          window.open("/item?id=0+" + d.data.value.id + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
+          //          window.open("/item?id=0+" + d.data.value.id + "+0+" + "vwbHbKv4Sg", "/lang?id=122");
         } else {
           x.domain([d.x0, d.x1]);
           y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
