@@ -496,7 +496,6 @@ window.gcexports.viewer = (function () {
           window.gcexports.dispatcher.dispatch({
             "L100": {
               data: {
-                "preview": undefined,
                 "generator": {
                   langID: "122",
                   codeID: d.data.value.id,
