@@ -3,13 +3,99 @@
 
 import {assert, message, messages, reserveCodeRange} from "./assert.js"
 import * as mjAPI from "mathjax-node/lib/mj-single.js"
-
+import * as https from "https";
+import * as http from "http";
 reserveCodeRange(1000, 1999, "compile");
 messages[1001] = "Node ID %1 not found in pool.";
 messages[1002] = "Invalid tag in node with Node ID %1.";
 messages[1003] = "No async callback provided.";
 messages[1004] = "No visitor method defined for '%1'.";
-
+const log = console.log;
+const stringify = JSON.stringify;
+function getGCHost() {
+  const LOCAL = global.port === 5130;
+  if (LOCAL) {
+    return "localhost";
+  } else {
+    return "www.graffiticode.com";
+  }
+}
+function getGCPort() {
+  const LOCAL = global.port === 5130;
+  if (LOCAL) {
+    return "3000";
+  } else {
+    return "443";
+  }
+}
+function getData(id, resume) {
+  var options = {
+    method: "GET",
+    host: getGCHost(),
+    port: getGCPort(),
+    path: "/data/?id=" + id,
+  };
+  const LOCAL = global.port === 5130;
+  const protocol = LOCAL ? http : https;
+  var req = protocol.get(options, function(res) {
+    var data = "";
+    res.on('data', function (chunk) {
+      data += chunk;
+    }).on('end', function () {
+      try {
+        resume(JSON.parse(data));
+      } catch (e) {
+        console.log("ERROR " + data);
+        console.log(e.stack);
+      }
+    }).on("error", function () {
+      console.log("error() status=" + res.statusCode + " data=" + data);
+    });
+  });
+}
+function putData(data, resume) {
+  let encodedData = JSON.stringify({
+    src: JSON.stringify(data) + "..",
+    ast: "",
+    obj: JSON.stringify(data),
+    img: "",
+    language: "L113",
+    label: "L130 data",
+  });
+  var options = {
+    host: getGCHost(),
+    port: getGCPort(),
+    path: "/code",
+    method: "PUT",
+    headers: {
+      'Content-Type': 'text/plain',
+      'Content-Length': Buffer.byteLength(encodedData),
+    },
+  };
+  const LOCAL = global.port === 5130;
+  const protocol = LOCAL ? http : https;
+  var req = protocol.request(options);
+  req.on("response", (res) => {
+    var data = "";
+    res.on('data', function (chunk) {
+      data += chunk;
+    }).on('end', function () {
+      try {
+        resume(JSON.parse(data).id);
+      } catch (e) {
+        console.log("ERROR " + data);
+        console.log(e.stack);
+      }
+    }).on("error", function () {
+      console.log("error() status=" + res.statusCode + " data=" + data);
+    });
+  });
+  req.end(encodedData);
+  req.on('error', function(err) {
+    console.log("ERROR " + err);
+    resume(err);
+  });
+}
 let transform = (function() {
   let table = [{
     // v0
@@ -259,8 +345,25 @@ let transform = (function() {
       options.data = {};
     }
     visit(node.elts[0], options, function (err, val) {
-      let data = options.data;
-      resume(err, data);
+      val =
+        val &&
+        val.length > 0 &&
+        typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
+      val.data = options.data;
+      getData("xVBIdPLquo", (items) => {
+        let map = {};
+        items.forEach(item => {
+          // Make a map for codeIDs to a list of saveIDs.
+          if (!map[item.codeID]) {
+            map[item.codeID] = [];
+          }
+          if (!map[item.codeID].includes(item.saveID)) {
+            map[item.codeID].push(item.saveID);
+          }
+        });
+        val.saveIDs = map;
+        resume(err, val);
+      });
     });
   }
   function key(node, options, resume) {
@@ -387,13 +490,33 @@ function tex2SVG(str, resume) {
     }
   });
 }
+function mapList(lst, fn, resume) {
+  if (lst && lst.length > 1) {
+    fn(lst[0], val1 => {
+      mapList(lst.slice(1), fn, function (val2) {
+        var val = [].concat(val1).concat(val2);
+        resume(val);
+      });
+    });
+  } else if (lst && lst.length > 0) {
+    fn(lst[0], val1 => {
+      let val = [];
+      if (val1 !== null) {
+        val = val.concat(val1);
+      }
+      resume(val);
+    });
+  } else {
+    resume([]);
+  }
+}
 let render = (function() {
   function render(val, resume) {
     // Do some rendering here.
-    mapListToObject(Object.keys(val), (key, resume) => { 
+    mapListToObject(Object.keys(val), (key, resume) => {
       let v = val[key];
       let itemID = v.id;
-      let title = v.title
+      let title = v.title;
       if (v.index) {
         fn(v.index, data => {
           resume(data);
@@ -408,7 +531,8 @@ let render = (function() {
             title: title,
           });
         } else {
-          let svgObj = {};
+          let svgObj = {
+          };
           mapListToObject(Object.keys(obj), (key, resume) => {
             let val = obj[key];
             tex2SVG(key, (err, svgKey) => {
@@ -421,53 +545,37 @@ let render = (function() {
         }
       }
     }, resume);
-    function mapList(lst, fn, resume) {
-      if (lst && lst.length > 1) {
-        fn(lst[0], val1 => {
-          mapList(lst.slice(1), fn, function (val2) {
-            var val = [].concat(val2);
-            if (val1 !== null) {
-              val.unshift(val1);
-            }
-            resume(val);
-          });
-        });
-      } else if (lst && lst.length > 0) {
-        fn(lst[0], val1 => {
-          let val = [];
-          if (val1 !== null) {
-            val.push(val1);
-          }
-          resume(val);
-        });
-      } else {
-        resume([]);
-      }
-    }
     function merge(o1, o2) {
-      let obj = {};
+      let obj = {
+      };
       if (o1 && o2 &&
           typeof o1 === "object" &&
           typeof o2 === "object") {
         Object.keys(o1).forEach(k => {
           // Merge properties in o1.
           if (typeof o1[k] === "object" && typeof o2[k] === "object") {
+            // Both are objects so merge them.
             obj[k] = merge(o1[k], o2[k]);
           } else {
+            // One ore both children are not objects, so assign o1 child here
+            // and o2 child later.
             obj[k] = o1[k];
           }
         });
         Object.keys(o2).forEach(k => {
           // Now add the o2 only properties.
           if (!obj[k]) {
+            // Don't have this property yet, so assign o2 child.
             obj[k] = o2[k];
           }
         });
       } else if (o1 && typeof o1 === "object") {
+        assert(false);
         Object.keys(o2).forEach(k => {
           obj[k] = o1[k];
         });
       } else if (o2 && typeof o2 === "object") {
+        assert(false);
         Object.keys(o2).forEach(k => {
           obj[k] = o2[k];
         });
@@ -500,6 +608,69 @@ export let compiler = (function () {
   exports.compile = function compile(code, data, resume) {
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
+    function getIDs(node, saveIDs) {
+      let ids = [];
+      if (node !== null && typeof node === "object") {
+        let keys = Object.keys(node);
+        keys.forEach((k) => {
+          if (node[k].id) {
+            ids.push(node[k].id);
+          } else {
+            ids = ids.concat(getIDs(node[k], saveIDs));
+          };
+        });
+        let idMap = [];
+        ids.forEach((id) => {
+          if (saveIDs[id]) {
+            saveIDs[id].forEach(saveID => {
+              idMap.push({
+                saveID: saveID,
+                codeID: id,
+              });
+            });
+          }
+        });
+        putData(idMap, (id) => {
+          node.ids = id;
+        });
+      }
+    }
+    function setIDs(node, saveIDs, resume) {
+      let ids = [];
+      if (node !== null && typeof node === "object") {
+        let keys = Object.keys(node);
+        mapList(keys, (k, resume) => {
+          if (node[k].id) {
+//            console.log("[1] setIDs() node[k].id=" + node[k].id);
+            resume(node[k].id);
+          } else {
+            setIDs(node[k], saveIDs, (ids) => {
+//              console.log("[1] setIDs() ids=" + ids);
+              resume(ids);
+            });
+          };
+        }, (ids) => {
+          let idMap = [];
+//          console.log("[2] setIDs() ids=" + ids);
+          ids.forEach((id) => {
+            if (saveIDs[id]) {
+              saveIDs[id].forEach(saveID => {
+                idMap.push({
+                  saveID: saveID,
+                  codeID: id,
+                });
+              });
+            }
+          });
+//          console.log("[3] setIDs() idMap=" + JSON.stringify(idMap));
+          putData(idMap, (id) => {
+//            console.log("[4] setIDs() id=" + id);
+            node.ids = id;
+            resume(id);
+          });
+        })
+      }
+    }
     try {
       let options = {
         data: data
@@ -508,11 +679,16 @@ export let compiler = (function () {
         if (err.length) {
           resume(err, val);
         } else {
-          render(val, function (val) {
-            tex2SVG("\\ldots", (e, svg) => {
-              let root = {};
-              root[escapeXML(svg)] = val;
-              resume(err, root);
+          let data = val.data;
+          let saveIDs = val.saveIDs;
+          render(data, val => {
+//            console.log("render() saveIDs=" + JSON.stringify(saveIDs, null, 2));
+            setIDs(val, saveIDs, (ids) => {
+              tex2SVG("\\ldots", (e, svg) => {
+                let root = {};
+                root[escapeXML(svg)] = val;
+                resume(err, root);
+              });
             });
           });
         }

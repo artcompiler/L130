@@ -31,6 +31,7 @@ app.get("/compile", function(req, res) {
           error: err,
         });
       } else {
+//        console.log("GET /compile val=" + JSON.stringify(val, null, 2));
         res.json(val);
       }
     });
@@ -44,6 +45,7 @@ app.get('/.well-known/acme-challenge/EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE
   res.send("EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
 });
 app.listen(app.get('port'), function() {
+  global.port = app.get("port");
   console.log("Node app is running at localhost:" + app.get('port'))
 });
 process.on('uncaughtException', function(err) {
