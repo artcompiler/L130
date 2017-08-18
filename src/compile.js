@@ -43,6 +43,7 @@ function getData(id, resume) {
       data += chunk;
     }).on('end', function () {
       try {
+        console.log("getData() data=" + data);
         resume(JSON.parse(data));
       } catch (e) {
         console.log("ERROR " + data);
@@ -640,18 +641,21 @@ export let compiler = (function () {
       if (node !== null && typeof node === "object") {
         let keys = Object.keys(node);
         mapList(keys, (k, resume) => {
+          // Iterate over properties of node populating a list according to
+          // this function.
           if (node[k].id) {
-//            console.log("[1] setIDs() node[k].id=" + node[k].id);
-            resume(node[k].id);
+            resume([node[k].id]);
           } else {
+            // If not leaf, drill down.
             setIDs(node[k], saveIDs, (ids) => {
-//              console.log("[1] setIDs() ids=" + ids);
               resume(ids);
             });
           };
         }, (ids) => {
+          // Got codeIDs for children of current node. Now create a map of
+          // saveIDs and codeIDs.
           let idMap = [];
-//          console.log("[2] setIDs() ids=" + ids);
+          console.log("[2] setIDs() ids=" + ids);
           ids.forEach((id) => {
             if (saveIDs[id]) {
               saveIDs[id].forEach(saveID => {
@@ -660,13 +664,18 @@ export let compiler = (function () {
                   codeID: id,
                 });
               });
+            } else {
+              idMap.push({
+                saveID: id,
+                codeID: id,
+              });
             }
           });
-//          console.log("[3] setIDs() idMap=" + JSON.stringify(idMap));
           putData(idMap, (id) => {
-//            console.log("[4] setIDs() id=" + id);
-            node.ids = id;
-            resume(id);
+            // Compile idMap using L113 and store its ID.
+            console.log("[4] setIDs() id=" + id);
+            node.link = id;
+            resume(ids);
           });
         })
       }
@@ -682,7 +691,6 @@ export let compiler = (function () {
           let data = val.data;
           let saveIDs = val.saveIDs;
           render(data, val => {
-//            console.log("render() saveIDs=" + JSON.stringify(saveIDs, null, 2));
             setIDs(val, saveIDs, (ids) => {
               tex2SVG("\\ldots", (e, svg) => {
                 let root = {};

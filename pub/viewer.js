@@ -537,7 +537,7 @@ window.gcexports.viewer = function () {
       var data = this.props.obj;
 
       var root = d3.hierarchy(d3.entries(data)[0], function (d) {
-        return d3.entries(d.value.id ? d.value.id : d.key !== "ids" ? d.value : undefined);
+        return d3.entries(d.value.id ? d.value.id : typeof d.value === "string" ? undefined : d.value);
       }).sum(function (d) {
         return d.value.id === undefined ? d.value : 1;
       }).sort(function (a, b) {
@@ -614,46 +614,41 @@ window.gcexports.viewer = function () {
 
       function clicked(d) {
         // Open L132 with d.data.ids as data. Get dataID
-        if (d.data.value.id !== undefined) {
-          // We have a leaf node.
+        x.domain([d.x0, d.x1]);
+        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        cell.selectAll("rect").transition().duration(250).attr("x", function (d) {
+          return x(d.x0);
+        }).attr("y", function (d) {
+          return y(d.y0);
+        }).attr("width", function (d) {
+          return x(d.x1) - x(d.x0);
+        }).attr("height", function (d) {
+          return y(d.y1) - y(d.y0);
+        });
+        cell.selectAll("image").transition().duration(250).attr("x", function (d) {
+          return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
+        }).attr("y", function (d) {
+          return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
+        }).style("opacity", function (d) {
+          return getWidth(d.data.key) > x(d.x1) - x(d.x0) || getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1;
+        });
+        if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {
             window.gcexports.dispatcher.dispatch({
               "L100": {
                 data: {
                   "generator": {
                     langID: "122",
-                    codeID: d.data.value.id,
-                    dataID: "0"
+                    codeID: "7vWiozKxsO",
+                    dataID: d.data.value.ids
                   }
                 },
                 recompileCode: true
               }
             });
           } else {
-            window.open("/form?id=122+" + d.data.value.id + "+" + "vwbHbKv4Sg", "/lang?id=122");
+            window.open("/form?id=7vWiozKxsO+" + d.data.value.link, "/lang?id=132");
           }
-        } else {
-          if (d.data.value.ids) {
-            window.open("/form?id=7vWiozKxsO+" + d.data.value.ids, "/lang?id=132");
-          }
-          x.domain([d.x0, d.x1]);
-          y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
-          cell.selectAll("rect").transition().duration(250).attr("x", function (d) {
-            return x(d.x0);
-          }).attr("y", function (d) {
-            return y(d.y0);
-          }).attr("width", function (d) {
-            return x(d.x1) - x(d.x0);
-          }).attr("height", function (d) {
-            return y(d.y1) - y(d.y0);
-          });
-          cell.selectAll("image").transition().duration(250).attr("x", function (d) {
-            return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
-          }).attr("y", function (d) {
-            return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
-          }).style("opacity", function (d) {
-            return getWidth(d.data.key) > x(d.x1) - x(d.x0) || getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1;
-          });
         }
       }
     },
