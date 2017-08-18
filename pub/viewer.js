@@ -638,9 +638,9 @@ window.gcexports.viewer = function () {
               "L100": {
                 data: {
                   "generator": {
-                    langID: "122",
-                    codeID: "7vWiozKxsO",
-                    dataID: d.data.value.ids
+                    langID: 132,
+                    codeID: 530171,
+                    dataID: d.data.value.link
                   }
                 },
                 recompileCode: true
@@ -648,6 +648,23 @@ window.gcexports.viewer = function () {
             });
           } else {
             window.open("/form?id=7vWiozKxsO+" + d.data.value.link, "/lang?id=132");
+          }
+        } else if (d.data.value.id) {
+          if (window.parent.gcexports.language === "L100") {
+            window.gcexports.dispatcher.dispatch({
+              "L100": {
+                data: {
+                  "generator": {
+                    langID: 122,
+                    codeID: d.data.value.id,
+                    dataID: 0
+                  }
+                },
+                recompileCode: true
+              }
+            });
+          } else {
+            window.open("/form?id=0+" + d.data.value.id + "0", "/lang?id=132");
           }
         }
       }

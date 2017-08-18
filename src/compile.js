@@ -43,7 +43,6 @@ function getData(id, resume) {
       data += chunk;
     }).on('end', function () {
       try {
-        console.log("getData() data=" + data);
         resume(JSON.parse(data));
       } catch (e) {
         console.log("ERROR " + data);
@@ -655,7 +654,6 @@ export let compiler = (function () {
           // Got codeIDs for children of current node. Now create a map of
           // saveIDs and codeIDs.
           let idMap = [];
-          console.log("[2] setIDs() ids=" + ids);
           ids.forEach((id) => {
             if (saveIDs[id]) {
               saveIDs[id].forEach(saveID => {
@@ -673,7 +671,6 @@ export let compiler = (function () {
           });
           putData(idMap, (id) => {
             // Compile idMap using L113 and store its ID.
-            console.log("[4] setIDs() id=" + id);
             node.link = id;
             resume(ids);
           });
