@@ -558,7 +558,9 @@ window.gcexports.viewer = function () {
         return d.y1 - d.y0;
       }).attr("stroke", "#fff").attr("fill", function (d) {
         return "#B0C4DE";
-      }).on("click", clicked);
+      })
+      //        .attr("fill", "rgba(8, 149, 194, 0.10)")  // #0895c2
+      .on("click", clicked);
 
       cell.append("title").text(function (d) {
         return d.data.value.title ? d.data.value.title : "";

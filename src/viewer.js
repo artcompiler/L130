@@ -430,6 +430,7 @@ window.gcexports.viewer = (function () {
         .attr("height", function(d) { return d.y1 - d.y0; })
         .attr("stroke", "#fff")
         .attr("fill", (d) => { return "#B0C4DE"; })
+//        .attr("fill", "rgba(8, 149, 194, 0.10)")  // #0895c2
         .on("click", clicked);
 
       cell.append("title")
