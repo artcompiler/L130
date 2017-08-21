@@ -549,7 +549,7 @@ window.gcexports.viewer = (function () {
               }
             });
           } else {
-            window.open("/form?id=0+" + d.data.value.id + "0", "/lang?id=132");
+            window.open("/form?id=132+" + d.data.value.id + "0", "/lang?id=132");
           }
         }
       }
