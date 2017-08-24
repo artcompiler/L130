@@ -608,33 +608,6 @@ export let compiler = (function () {
   exports.compile = function compile(code, data, resume) {
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
-    function getIDs(node, saveIDs) {
-      let ids = [];
-      if (node !== null && typeof node === "object") {
-        let keys = Object.keys(node);
-        keys.forEach((k) => {
-          if (node[k].id) {
-            ids.push(node[k].id);
-          } else {
-            ids = ids.concat(getIDs(node[k], saveIDs));
-          };
-        });
-        let idMap = [];
-        ids.forEach((id) => {
-          if (saveIDs[id]) {
-            saveIDs[id].forEach(saveID => {
-              idMap.push({
-                saveID: saveID,
-                codeID: id,
-              });
-            });
-          }
-        });
-        putData(idMap, (id) => {
-          node.ids = id;
-        });
-      }
-    }
     function setIDs(node, saveIDs, resume) {
       let ids = [];
       if (node !== null && typeof node === "object") {
@@ -655,6 +628,11 @@ export let compiler = (function () {
           // saveIDs and codeIDs.
           let idMap = [];
           ids.forEach((id) => {
+            // Always include the default, unsaved generator.
+            idMap.push({
+              saveID: id,
+              codeID: id,
+            });
             if (saveIDs[id]) {
               saveIDs[id].forEach(saveID => {
                 idMap.push({
@@ -662,11 +640,11 @@ export let compiler = (function () {
                   codeID: id,
                 });
               });
-            } else {
-              idMap.push({
-                saveID: "122+" + id + "+0",
-                codeID: id,
-              });
+            // } else {
+            //   idMap.push({
+            //     saveID: id,
+            //     codeID: id,
+            //   });
             }
           });
           putData(idMap, (id) => {

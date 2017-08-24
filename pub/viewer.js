@@ -666,7 +666,8 @@ window.gcexports.viewer = function () {
               }
             });
           } else {
-            window.open("/form?id=132+" + d.data.value.id + "0", "/lang?id=132");
+            //            let id = window.gcexports.encodeID([132, +d.data.value.id, 0]);
+            window.open("/item?id=0+" + d.data.value.id + "+vwbHbKv4Sg", "/lang?id=122");
           }
         }
       }
