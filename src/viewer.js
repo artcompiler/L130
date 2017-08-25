@@ -550,8 +550,10 @@ window.gcexports.viewer = (function () {
               }
             });
           } else {
-//            let id = window.gcexports.encodeID([132, +d.data.value.id, 0]);
-            window.open("/item?id=0+" + d.data.value.id + "+vwbHbKv4Sg", "/lang?id=122");
+            let dataIDs = window.gcexports.decodeID("vwbHbKv4Sg");
+            let ids = [122, +d.data.value.id].concat(dataIDs);
+            let id = window.gcexports.encodeID(ids);
+            window.open("/item?id=" + id, "/lang?id=122");
           }
         }
       }
