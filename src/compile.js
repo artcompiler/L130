@@ -351,6 +351,7 @@ let transform = (function() {
         typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
       val.data = options.data;
       getData("xVBIdPLquo", (items) => {
+        // L131 query for L131 entries 
         let map = {};
         items.forEach(item => {
           // Make a map for codeIDs to a list of saveIDs.
@@ -640,11 +641,6 @@ export let compiler = (function () {
                   codeID: id,
                 });
               });
-            // } else {
-            //   idMap.push({
-            //     saveID: id,
-            //     codeID: id,
-            //   });
             }
           });
           putData(idMap, (id) => {
