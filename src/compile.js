@@ -53,14 +53,15 @@ function getData(id, resume) {
     });
   });
 }
-function putData(data, resume) {
+function putData(obj, resume) {
   let encodedData = JSON.stringify({
-    src: JSON.stringify(data) + "..",
+    src: JSON.stringify(obj) + "..",
     ast: "",
-    obj: JSON.stringify(data),
+    obj: JSON.stringify(obj),
     img: "",
     language: "L113",
     label: "L130 data",
+    caller: "L130 compile",
   });
   var options = {
     host: getGCHost(),
@@ -81,7 +82,8 @@ function putData(data, resume) {
       data += chunk;
     }).on('end', function () {
       try {
-        resume(JSON.parse(data).id);
+        let id = JSON.parse(data).id;
+        resume(id);
       } catch (e) {
         console.log("ERROR " + data);
         console.log(e.stack);
@@ -631,7 +633,8 @@ export let compiler = (function () {
           ids.forEach((id) => {
             // Always include the default, unsaved generator.
             idMap.push({
-              saveID: id,
+              isCode: true,
+              saveID: "122+" + id + "+0",
               codeID: id,
             });
             if (saveIDs[id]) {
