@@ -7,9 +7,6 @@ var compiler = require("./lib/compile.js");
 var app = express();
 app.set('port', (process.env.PORT || 5130));
 app.use(express.static(__dirname + '/pub'));
-app.get("/.well-known/acme-challenge/S4EDKpiNxlbJT1sGyWksMQ28FXJdXcn553EhoINNW-U", function(req, res) {
-  res.send("S4EDKpiNxlbJT1sGyWksMQ28FXJdXcn553EhoINNW-U.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
-});
 app.get('/', function(req, res) {
   res.send("Hello, L130!");
 });
@@ -25,6 +22,7 @@ app.get("/compile", function(req, res) {
     body = JSON.parse(body);
     let code = body.src;
     let data = body.data;
+    data.REFRESH = body.refresh; // Stowaway flag.
     let t0 = new Date;
     let obj = compiler.compile(code, data, function (err, val) {
       if (err.length) {
@@ -41,9 +39,6 @@ app.get("/compile", function(req, res) {
     console.log(e);
     res.send(e);
   });
-});
-app.get('/.well-known/acme-challenge/EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE', function(req, res) {
-  res.send("EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
 });
 app.listen(app.get('port'), function() {
   global.port = app.get("port");

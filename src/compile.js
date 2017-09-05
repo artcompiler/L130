@@ -28,12 +28,12 @@ function getGCPort() {
     return "443";
   }
 }
-function getData(id, resume) {
+function getData(id, refresh, resume) {
   var options = {
     method: "GET",
     host: getGCHost(),
     port: getGCPort(),
-    path: "/data/?id=" + id,
+    path: "/data/?id=" + id + (refresh ? "&refresh=true" : ""),
   };
   const LOCAL = global.port === 5130;
   const protocol = LOCAL ? http : https;
@@ -352,7 +352,7 @@ let transform = (function() {
         val.length > 0 &&
         typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
       val.data = options.data;
-      getData("xVBIdPLquo", (items) => {
+      getData("zVnIWMLvIO", options.data.REFRESH, (items) => {
         // L131 query for L131 entries 
         let map = {};
         items.forEach(item => {
