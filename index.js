@@ -21,7 +21,7 @@ app.get("/compile", function(req, res) {
   req.on('end', function () {
     body = JSON.parse(body);
     let code = body.src;
-    let data = body.data;
+    let data = body.data ? body.data : {};
     data.REFRESH = body.refresh; // Stowaway flag.
     let t0 = new Date;
     let obj = compiler.compile(code, data, function (err, val) {

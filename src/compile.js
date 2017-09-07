@@ -352,19 +352,28 @@ let transform = (function() {
         val.length > 0 &&
         typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
       val.data = options.data;
-      getData("zVnIWMLvIO", options.data.REFRESH, (items) => {
+      getData("Vp6sQ6YriJ", options.data.REFRESH, (items) => {
         // L131 query for L131 entries 
-        let map = {};
+        let saveIDs = {};
+        let recordIDs = {};
         items.forEach(item => {
           // Make a map for codeIDs to a list of saveIDs.
-          if (!map[item.codeID]) {
-            map[item.codeID] = [];
+          if (!saveIDs[item.codeID]) {
+            saveIDs[item.codeID] = [];
           }
-          if (!map[item.codeID].includes(item.saveID)) {
-            map[item.codeID].push(item.saveID);
+          if (!saveIDs[item.codeID].includes(item.saveID)) {
+            saveIDs[item.codeID].push(item.saveID);
+          }
+          // Make a map of saveIDs to save recordIDs.
+          if (!recordIDs[item.saveID]) {
+            recordIDs[item.saveID] = [];
+          }
+          if (!recordIDs[item.saveID].includes(item.id)) {
+            recordIDs[item.saveID].push(item.id);
           }
         });
-        val.saveIDs = map;
+        val.saveIDs = saveIDs;
+        val.recordIDs = recordIDs;
         resume(err, val);
       });
     });
@@ -611,7 +620,7 @@ export let compiler = (function () {
   exports.compile = function compile(code, data, resume) {
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
-    function setIDs(node, saveIDs, resume) {
+    function setIDs(node, saveIDs, recordIDs, resume) {
       let ids = [];
       if (node !== null && typeof node === "object") {
         let keys = Object.keys(node);
@@ -622,7 +631,7 @@ export let compiler = (function () {
             resume([node[k].id]);
           } else {
             // If not leaf, drill down.
-            setIDs(node[k], saveIDs, (ids) => {
+            setIDs(node[k], saveIDs, recordIDs, (ids) => {
               resume(ids);
             });
           };
@@ -639,9 +648,11 @@ export let compiler = (function () {
             });
             if (saveIDs[id]) {
               saveIDs[id].forEach(saveID => {
+                // for each saveID create a map from it to its codeID.
                 idMap.push({
                   saveID: saveID,
                   codeID: id,
+                  recordIDs: recordIDs[saveID],
                 });
               });
             }
@@ -664,8 +675,9 @@ export let compiler = (function () {
         } else {
           let data = val.data;
           let saveIDs = val.saveIDs;
+          let recordIDs = val.recordIDs;
           render(data, val => {
-            setIDs(val, saveIDs, (ids) => {
+            setIDs(val, saveIDs, recordIDs, (ids) => {
               tex2SVG("\\ldots", (e, svg) => {
                 let root = {};
                 root[escapeXML(svg)] = val;

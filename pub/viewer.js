@@ -669,7 +669,7 @@ window.gcexports.viewer = function () {
             var dataIDs = window.gcexports.decodeID("vwbHbKv4Sg");
             var ids = [122, +d.data.value.id].concat(dataIDs);
             var id = window.gcexports.encodeID(ids);
-            window.open("/item?id=" + id, "/lang?id=122");
+            window.open("/form?id=" + id, "/lang?id=122");
           }
         }
       }
