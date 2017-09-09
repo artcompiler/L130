@@ -43,10 +43,11 @@ function getData(id, refresh, resume) {
       data += chunk;
     }).on('end', function () {
       try {
-        resume(JSON.parse(data));
+        resume([], JSON.parse(data));
       } catch (e) {
         console.log("ERROR " + data);
         console.log(e.stack);
+        resume([e], null);
       }
     }).on("error", function () {
       console.log("error() status=" + res.statusCode + " data=" + data);
@@ -352,29 +353,33 @@ let transform = (function() {
         val.length > 0 &&
         typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
       val.data = options.data;
-      getData("Vp6sQ6YriJ", options.data.REFRESH, (items) => {
-        // L131 query for L131 entries 
-        let saveIDs = {};
-        let recordIDs = {};
-        items.forEach(item => {
-          // Make a map for codeIDs to a list of saveIDs.
-          if (!saveIDs[item.codeID]) {
-            saveIDs[item.codeID] = [];
-          }
-          if (!saveIDs[item.codeID].includes(item.saveID)) {
-            saveIDs[item.codeID].push(item.saveID);
-          }
-          // Make a map of saveIDs to save recordIDs.
-          if (!recordIDs[item.saveID]) {
-            recordIDs[item.saveID] = [];
-          }
-          if (!recordIDs[item.saveID].includes(item.id)) {
-            recordIDs[item.saveID].push(item.id);
-          }
-        });
-        val.saveIDs = saveIDs;
-        val.recordIDs = recordIDs;
-        resume(err, val);
+      getData("Vp6sQ6YriJ", options.data.REFRESH, (err, items) => {
+        if (err.length > 0) {
+          resume(err, null);
+        } else {
+          // L131 query for L131 entries 
+          let saveIDs = {};
+          let recordIDs = {};
+          items.forEach(item => {
+            // Make a map for codeIDs to a list of saveIDs.
+            if (!saveIDs[item.codeID]) {
+              saveIDs[item.codeID] = [];
+            }
+            if (!saveIDs[item.codeID].includes(item.saveID)) {
+              saveIDs[item.codeID].push(item.saveID);
+            }
+            // Make a map of saveIDs to save recordIDs.
+            if (!recordIDs[item.saveID]) {
+              recordIDs[item.saveID] = [];
+            }
+            if (!recordIDs[item.saveID].includes(item.id)) {
+              recordIDs[item.saveID].push(item.id);
+            }
+          });
+          val.saveIDs = saveIDs;
+          val.recordIDs = recordIDs;
+          resume(err, val);
+        }
       });
     });
   }
