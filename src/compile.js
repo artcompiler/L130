@@ -355,9 +355,10 @@ let transform = (function() {
       val.data = options.data;
       getData("Vp6sQ6YriJ", options.data.REFRESH, (err, items) => {
         if (err.length > 0) {
+          console.log("ERROR err=" + err);
           resume(err, null);
         } else {
-          // L131 query for L131 entries 
+          // L131 query for L131 entries
           let saveIDs = {};
           let recordIDs = {};
           items.forEach(item => {
