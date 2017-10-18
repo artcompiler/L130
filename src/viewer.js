@@ -3,7 +3,6 @@
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
 import * as d3 from "d3";
-
 window.gcexports.viewer = (function () {
   function capture(el) {
     return null;
@@ -386,22 +385,23 @@ window.gcexports.viewer = (function () {
 
   // Graffiticode looks for this React class named Viewer. The compiled code is
   // passed via props in the renderer.
+  let isVert = false;
   var Viewer = React.createClass({
     componentDidMount () {
       var width = 960,
           height = 500;
       var x = d3.scaleLinear()
-        .range([0, width]);
+        .range([0, isVert ? width : height]);
       var y = d3.scaleLinear()
-        .range([0, height]);
+        .range([0, isVert ? height: width]);
       var color = d3.scaleOrdinal(d3.schemeCategory20c);
       var partition = d3.partition()
-        .size([width, height])
+        .size([isVert ? width : height, isVert ? height : width])
         .padding(0)
         .round(true);
       var svg = d3.select(".container").append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", true || isVert ? width : height)
+        .attr("height", true || isVert ? height : width);
 
       let data = this.props.obj;
 
@@ -424,10 +424,18 @@ window.gcexports.viewer = (function () {
         .attr("class", "node");
 
       cell.append("rect")
-        .attr("x", function(d) { return d.x0; })
-        .attr("y", function(d) { return d.y0; })
-        .attr("width", function(d) { return d.x1 - d.x0; })
-        .attr("height", function(d) { return d.y1 - d.y0; })
+        .attr("x", function(d) {
+          return isVert ? d.x0 : d.y0;
+        })
+        .attr("y", function(d) {
+          return isVert ? d.y0 : d.x0;
+        })
+        .attr("width", function(d) {
+          return isVert ? d.x1 - d.x0 : d.y1 - d.y0;
+        })
+        .attr("height", function(d) {
+          return isVert ? d.y1 - d.y0 : d.x1 - d.x0;
+        })
         .attr("stroke", "#fff")
         .attr("fill", (d) => { return "#B0C4DE"; })
 //        .attr("fill", "rgba(8, 149, 194, 0.10)")  // #0895c2
@@ -440,21 +448,32 @@ window.gcexports.viewer = (function () {
 
       let size = 10;
       cell.append("image")
-        .attr("x", function(d) { return d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2; })
-        .attr("y", function(d) { return d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2; })
-        .attr("width", function(d) {
-          return getWidth(d.data.key)
+        .attr("x", function(d) {
+          return isVert 
+            ? d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2
+            : d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2; 
         })
-        .attr("height", function(d) { return getHeight(d.data.key); })
+        .attr("y", function(d) {
+          return isVert
+            ? d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2
+            : d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2;
+        })
+        .attr("width", function(d) {
+          return isVert ? getWidth(d.data.key) : getHeight(d.data.key);
+        })
+        .attr("height", function(d) {
+          return isVert ? getHeight(d.data.key) : getWidth(d.data.key);
+        })
         .attr("href", (d) => {
           let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
           return href;
         })
         .style("opacity", function(d) {
-          return getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0;
+          return isVert
+            ? getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0
+            : getHeight(d.data.key) < d.y1 - d.y0 ? 1 : 0;
         })
         .on("click", clicked);
-
 
       function getWidth(str) {
         var EX = 6; // px
@@ -499,24 +518,41 @@ window.gcexports.viewer = (function () {
         cell.selectAll("rect")
           .transition()
           .duration(250)
-          .attr("x", function(d) { return x(d.x0); })
-          .attr("y", function(d) { return y(d.y0); })
-          .attr("width", function(d) { return x(d.x1) - x(d.x0); })
-          .attr("height", function(d) { return y(d.y1) - y(d.y0); });
+          .attr("x", function(d) {
+            return isVert ? x(d.x0) : y(d.y0);
+          })
+          .attr("y", function(d) {
+            return isVert ? y(d.y0) : x(d.x0);
+          })
+          .attr("width", function(d) {
+            return isVert
+              ? x(d.x1) - x(d.x0)
+              : y(d.y1) - y(d.y0)
+          })
+          .attr("height", function(d) {
+            return isVert
+              ? y(d.y1) - y(d.y0)
+              : x(d.x1) - x(d.x0)
+          });
         cell.selectAll("image")
           .transition()
           .duration(250)
           .attr("x", function(d) {
-            return x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
+            return isVert
+              ? x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2
+              : y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
           })
           .attr("y", function(d) {
-            return y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
+            return isVert
+              ? y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2
+              : x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
           })
           .style("opacity", function(d) {
-            return (
-              getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
-                getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1
-            );
+            return isVert
+              ? (getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
+                 getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1)
+              : (getHeight(d.data.key) > y(d.y1) - y(d.y0) ||
+                 getWidth(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1);
           })
         if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {
