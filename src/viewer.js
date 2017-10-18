@@ -389,7 +389,7 @@ window.gcexports.viewer = (function () {
   var Viewer = React.createClass({
     componentDidMount () {
       var width = 960,
-          height = 500;
+          height = 600;
       var x = d3.scaleLinear()
         .range([0, isVert ? width : height]);
       var y = d3.scaleLinear()
@@ -400,8 +400,8 @@ window.gcexports.viewer = (function () {
         .padding(0)
         .round(true);
       var svg = d3.select(".container").append("svg")
-        .attr("width", true || isVert ? width : height)
-        .attr("height", true || isVert ? height : width);
+        .attr("width", width)
+        .attr("height", height);
 
       let data = this.props.obj;
 
@@ -451,18 +451,18 @@ window.gcexports.viewer = (function () {
         .attr("x", function(d) {
           return isVert 
             ? d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2
-            : d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2; 
+            : d.y0 + (d.y1 - d.y0 - getWidth(d.data.key)) / 2; 
         })
         .attr("y", function(d) {
           return isVert
             ? d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2
-            : d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2;
+            : d.x0 + (d.x1 - d.x0 - getHeight(d.data.key)) / 2;
         })
         .attr("width", function(d) {
-          return isVert ? getWidth(d.data.key) : getHeight(d.data.key);
+          return isVert ? getWidth(d.data.key) : getWidth(d.data.key);
         })
         .attr("height", function(d) {
-          return isVert ? getHeight(d.data.key) : getWidth(d.data.key);
+          return isVert ? getHeight(d.data.key) : getHeight(d.data.key);
         })
         .attr("href", (d) => {
           let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
@@ -514,7 +514,7 @@ window.gcexports.viewer = (function () {
       function clicked(d) {
         // Open L132 with d.data.ids as data. Get dataID
         x.domain([d.x0, d.x1]);
-        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        y.domain([d.y0, isVert ? height : width]).range([d.depth ? 20 : 0, isVert ? height : width]);
         cell.selectAll("rect")
           .transition()
           .duration(250)
@@ -540,19 +540,19 @@ window.gcexports.viewer = (function () {
           .attr("x", function(d) {
             return isVert
               ? x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2
-              : y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
+              : y(d.y0) + (y(d.y1) - y(d.y0) - getWidth(d.data.key)) / 2;
           })
           .attr("y", function(d) {
             return isVert
               ? y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2
-              : x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
+              : x(d.x0) + (x(d.x1) - x(d.x0) - getHeight(d.data.key)) / 2;
           })
           .style("opacity", function(d) {
             return isVert
               ? (getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
                  getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1)
-              : (getHeight(d.data.key) > y(d.y1) - y(d.y0) ||
-                 getWidth(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1);
+              : (getWidth(d.data.key) > y(d.y1) - y(d.y0) ||
+                 getHeight(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1);
           })
         if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {

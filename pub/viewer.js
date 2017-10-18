@@ -528,12 +528,12 @@ window.gcexports.viewer = function () {
     displayName: "Viewer",
     componentDidMount: function componentDidMount() {
       var width = 960,
-          height = 500;
+          height = 600;
       var x = d3.scaleLinear().range([0, isVert ? width : height]);
       var y = d3.scaleLinear().range([0, isVert ? height : width]);
       var color = d3.scaleOrdinal(d3.schemeCategory20c);
       var partition = d3.partition().size([isVert ? width : height, isVert ? height : width]).padding(0).round(true);
-      var svg = d3.select(".container").append("svg").attr("width", true || isVert ? width : height).attr("height", true || isVert ? height : width);
+      var svg = d3.select(".container").append("svg").attr("width", width).attr("height", height);
 
       var data = this.props.obj;
 
@@ -568,33 +568,20 @@ window.gcexports.viewer = function () {
       });
 
       var size = 10;
-      // cell.append("image")
-      //   .attr("x", function(d) {
-      //     return isVert 
-      //       ? d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2
-      //       : d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2; 
-      //   })
-      //   .attr("y", function(d) {
-      //     return isVert
-      //       ? d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2
-      //       : d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2;
-      //   })
-      //   .attr("width", function(d) {
-      //     return isVert ? getWidth(d.data.key) : getHeight(d.data.key);
-      //   })
-      //   .attr("height", function(d) {
-      //     return isVert ? getHeight(d.data.key) : getWidth(d.data.key);
-      //   })
-      //   .attr("href", (d) => {
-      //     let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
-      //     return href;
-      //   })
-      //   .style("opacity", function(d) {
-      //     return isVert
-      //       ? getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0
-      //       : getHeight(d.data.key) < d.y1 - d.y0 ? 1 : 0;
-      //   })
-      //   .on("click", clicked);
+      cell.append("image").attr("x", function (d) {
+        return isVert ? d.x0 + (d.x1 - d.x0 - getWidth(d.data.key)) / 2 : d.y0 + (d.y1 - d.y0 - getWidth(d.data.key)) / 2;
+      }).attr("y", function (d) {
+        return isVert ? d.y0 + (d.y1 - d.y0 - getHeight(d.data.key)) / 2 : d.x0 + (d.x1 - d.x0 - getHeight(d.data.key)) / 2;
+      }).attr("width", function (d) {
+        return isVert ? getWidth(d.data.key) : getWidth(d.data.key);
+      }).attr("height", function (d) {
+        return isVert ? getHeight(d.data.key) : getHeight(d.data.key);
+      }).attr("href", function (d) {
+        var href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
+        return href;
+      }).style("opacity", function (d) {
+        return isVert ? getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0 : getHeight(d.data.key) < d.y1 - d.y0 ? 1 : 0;
+      }).on("click", clicked);
 
       function getWidth(str) {
         var EX = 6; // px
@@ -631,7 +618,7 @@ window.gcexports.viewer = function () {
       function clicked(d) {
         // Open L132 with d.data.ids as data. Get dataID
         x.domain([d.x0, d.x1]);
-        y.domain([d.y0, height]).range([d.depth ? 20 : 0, height]);
+        y.domain([d.y0, isVert ? height : width]).range([d.depth ? 20 : 0, isVert ? height : width]);
         cell.selectAll("rect").transition().duration(250).attr("x", function (d) {
           return isVert ? x(d.x0) : y(d.y0);
         }).attr("y", function (d) {
@@ -641,26 +628,13 @@ window.gcexports.viewer = function () {
         }).attr("height", function (d) {
           return isVert ? y(d.y1) - y(d.y0) : x(d.x1) - x(d.x0);
         });
-        // cell.selectAll("image")
-        //   .transition()
-        //   .duration(250)
-        //   .attr("x", function(d) {
-        //     return isVert
-        //       ? x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2
-        //       : y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2;
-        //   })
-        //   .attr("y", function(d) {
-        //     return isVert
-        //       ? y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2
-        //       : x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2;
-        //   })
-        //   .style("opacity", function(d) {
-        //     return isVert
-        //       ? (getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
-        //          getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1)
-        //       : (getHeight(d.data.key) > y(d.y1) - y(d.y0) ||
-        //          getWidth(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1);
-        //   })
+        cell.selectAll("image").transition().duration(250).attr("x", function (d) {
+          return isVert ? x(d.x0) + (x(d.x1) - x(d.x0) - getWidth(d.data.key)) / 2 : y(d.y0) + (y(d.y1) - y(d.y0) - getWidth(d.data.key)) / 2;
+        }).attr("y", function (d) {
+          return isVert ? y(d.y0) + (y(d.y1) - y(d.y0) - getHeight(d.data.key)) / 2 : x(d.x0) + (x(d.x1) - x(d.x0) - getHeight(d.data.key)) / 2;
+        }).style("opacity", function (d) {
+          return isVert ? getWidth(d.data.key) > x(d.x1) - x(d.x0) || getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1 : getWidth(d.data.key) > y(d.y1) - y(d.y0) || getHeight(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1;
+        });
         if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {
             window.gcexports.dispatcher.dispatch({
