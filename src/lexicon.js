@@ -11,5 +11,6 @@ window.gcexports.globalLexicon = {
     "apply" : { "tk": 1, "name": "APPLY", "cls": "function", "length": 2, "arity": 2 },
     "icicle" : { "tk": 1, "name": "ICICLE", "cls": "function", "length": 0, "arity": 0 },
     "label" : { "tk": 1, "name": "LABEL", "cls": "function", "length": 2, "arity": 2 },
+    "root" : { "tk": 1, "name": "ROOT", "cls": "function", "length": 2, "arity": 2 },
     "arg" : { "tk": 1, "name": "ARG", "cls": "function", "length": 1, "arity": 1 }
 }

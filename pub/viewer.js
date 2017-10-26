@@ -528,7 +528,7 @@ window.gcexports.viewer = function () {
     displayName: "Viewer",
     componentDidMount: function componentDidMount() {
       var width = 960,
-          height = 600;
+          height = 800;
       var x = d3.scaleLinear().range([0, isVert ? width : height]);
       var y = d3.scaleLinear().range([0, isVert ? height : width]);
       var color = d3.scaleOrdinal(d3.schemeCategory20c);

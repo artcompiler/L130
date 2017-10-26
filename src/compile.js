@@ -139,6 +139,7 @@ let transform = (function() {
     "ICICLE" : icicle,
     "LABEL" : label,
     "MAP" : map,
+    "ROOT": root,
   }];
   let nodePool;
   let version;
@@ -237,6 +238,15 @@ let transform = (function() {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
         val2.label = val1;
+        resume([].concat(err1).concat(err2), val2);
+      });
+    });
+  }
+  function root(node, options, resume) {
+    // Return a function value.
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        val2.root = val1;
         resume([].concat(err1).concat(err2), val2);
       });
     });
@@ -531,12 +541,23 @@ function mapList(lst, fn, resume) {
 let render = (function() {
   function render(val, resume) {
     // Do some rendering here.
-    mapListToObject(Object.keys(val), (key, resume) => {
-      let v = val[key];
+    let data = val.data;
+    let root = val.root;
+    mapListToObject(Object.keys(data), (key, resume) => {
+      let v = data[key];
       let itemID = v.id;
       let title = v.title;
       if (v.index) {
-        fn(v.index, data => {
+        let index;
+        if (root) {
+          index = v.index[root];
+          if (!index) {
+            index = {};
+          }
+        } else {
+          index = v.index;
+        }
+        fn(index, data => {
           resume(data);
         });
       } else {
@@ -682,9 +703,10 @@ export let compiler = (function () {
           let data = val.data;
           let saveIDs = val.saveIDs;
           let recordIDs = val.recordIDs;
-          render(data, val => {
+          let root = val.root;
+          render(val, val => {
             setIDs(val, saveIDs, recordIDs, (ids) => {
-              tex2SVG("\\ldots", (e, svg) => {
+              tex2SVG(root || "\\ldots", (e, svg) => {
                 let root = {};
                 root[escapeXML(svg)] = val;
                 resume(err, root);
