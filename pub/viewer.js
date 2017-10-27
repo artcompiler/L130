@@ -580,7 +580,7 @@ window.gcexports.viewer = function () {
         var href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
         return href;
       }).style("opacity", function (d) {
-        return isVert ? getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0 : getHeight(d.data.key) < d.y1 - d.y0 ? 1 : 0;
+        return isVert ? getWidth(d.data.key) > d.x1 - d.x0 || getHeight(d.data.key) > d.y1 - d.y0 ? 0 : 1 : getWidth(d.data.key) > d.y1 - d.y0 || getHeight(d.data.key) > d.x1 - d.x0 ? 0 : 1;
       }).on("click", clicked);
 
       function getWidth(str) {

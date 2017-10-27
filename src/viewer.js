@@ -470,8 +470,10 @@ window.gcexports.viewer = (function () {
         })
         .style("opacity", function(d) {
           return isVert
-            ? getWidth(d.data.key) < d.x1 - d.x0 ? 1 : 0
-            : getHeight(d.data.key) < d.y1 - d.y0 ? 1 : 0;
+            ? getWidth(d.data.key) > d.x1 - d.x0 ||
+              getHeight(d.data.key) > d.y1 - d.y0 ? 0 : 1
+            : getWidth(d.data.key) > d.y1 - d.y0 ||
+              getHeight(d.data.key) > d.x1 - d.x0 ? 0 : 1;
         })
         .on("click", clicked);
 
@@ -549,10 +551,10 @@ window.gcexports.viewer = (function () {
           })
           .style("opacity", function(d) {
             return isVert
-              ? (getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
-                 getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1)
-              : (getWidth(d.data.key) > y(d.y1) - y(d.y0) ||
-                 getHeight(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1);
+              ? getWidth(d.data.key) > x(d.x1) - x(d.x0) ||
+                getHeight(d.data.key) > y(d.y1) - y(d.y0) ? 0 : 1
+              : getWidth(d.data.key) > y(d.y1) - y(d.y0) ||
+                getHeight(d.data.key) > x(d.x1) - x(d.x0) ? 0 : 1;
           })
         if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {
