@@ -653,7 +653,7 @@ window.gcexports.viewer = function () {
             window.open("/form?id=7vWiozKxsO+" + d.data.value.link, "/lang?id=132");
           }
         } else if (d.data.value.id) {
-          if (window.parent.gcexports.language === "L100") {
+          if (false && window.parent.gcexports.language === "L100") {
             window.gcexports.dispatcher.dispatch({
               "L100": {
                 data: {
