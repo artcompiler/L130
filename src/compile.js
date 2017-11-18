@@ -547,6 +547,7 @@ let render = (function() {
       let v = data[key];
       let itemID = v.id;
       let title = v.title;
+      let notes = v.notes;
       if (v.index) {
         let index;
         if (root) {
@@ -568,6 +569,7 @@ let render = (function() {
           resume({
             id: itemID,
             title: title,
+            notes: notes,
           });
         } else {
           let svgObj = {
@@ -673,7 +675,7 @@ export let compiler = (function () {
               saveID: "122+" + id + "+0",
               codeID: id,
             });
-            if (saveIDs[id]) {
+            if (saveIDs && saveIDs[id]) {
               saveIDs[id].forEach(saveID => {
                 // for each saveID create a map from it to its codeID.
                 idMap.push({
