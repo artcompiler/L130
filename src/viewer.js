@@ -591,7 +591,7 @@ window.gcexports.viewer = (function () {
             let dataIDs = window.gcexports.decodeID("vwbHbKv4Sg"); // show archive view
             let ids = [122, +d.data.value.id].concat(dataIDs);
             let id = window.gcexports.encodeID(ids);
-            window.open("/item?id=" + id, "/lang?id=122");
+            window.open("/item?id=" + id + "&archive=true", "/lang?id=122");
           }
         }
       }
