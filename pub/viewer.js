@@ -542,7 +542,7 @@ window.gcexports.viewer = function () {
       }).sum(function (d) {
         return d.value.id === undefined ? d.value : 1;
       }).sort(function (a, b) {
-        return b.value - a.value;
+        return b.data.value.index < a.data.value.index ? 1 : -1;
       });
 
       partition(root);

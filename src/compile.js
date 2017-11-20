@@ -578,6 +578,7 @@ let render = (function() {
             let val = obj[key];
             tex2SVG(key, (err, svgKey) => {
               fn(val, data => {
+                data.index = key;
                 svgObj[escapeXML(svgKey)] = data;
                 resume(svgObj);
               });
@@ -652,6 +653,8 @@ export let compiler = (function () {
     function setIDs(node, saveIDs, recordIDs, resume) {
       let ids = [];
       if (node !== null && typeof node === "object") {
+        let index = node.index;
+        delete node.index;
         let keys = Object.keys(node);
         mapList(keys, (k, resume) => {
           // Iterate over properties of node populating a list according to
@@ -689,6 +692,7 @@ export let compiler = (function () {
           putData(idMap, (id) => {
             // Compile idMap using L113 and store its ID.
             node.link = id;
+            node.index = index;
             resume(ids);
           });
         })
