@@ -118,6 +118,7 @@ function validate(token, resume) {
       jwt: token,
       lang: "L" + langID,
     }, (err, data) => {
+      console.log("validate() validated=" + JSON.stringify(validated) + " token=" + token);
       validated[token] = data;
       resume(err, data);
       count(token, 1);

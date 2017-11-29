@@ -363,11 +363,13 @@ let transform = (function() {
         val.length > 0 &&
         typeof val[val.length - 1] === "object" ? val[val.length - 1] : {};
       val.data = options.data;
+      console.log("program() items.length=" + items.length);
       getData("Vp6sQ6YriJ", options.data.REFRESH, (err, items) => {
         if (err.length > 0) {
           console.log("ERROR err=" + err);
           resume(err, null);
         } else {
+          console.log("program() items.length=" + items.length);
           // L131 query for L131 entries
           let saveIDs = {};
           let recordIDs = {};
