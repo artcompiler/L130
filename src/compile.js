@@ -390,8 +390,8 @@ let transform = (function() {
           });
           val.saveIDs = saveIDs;
           val.recordIDs = recordIDs;
-          console.log("program() saveIDs.length=" + saveIDs.length);
-          console.log("program() recordIDs.length=" + recordIDs.length);
+          console.log("program() saveIDs.length=" + Object.keys(saveIDs).length);
+          console.log("program() recordIDs.length=" + Object.keys(recordIDs).length);
           resume(err, val);
         }
       });
