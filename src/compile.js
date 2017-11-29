@@ -390,6 +390,8 @@ let transform = (function() {
           });
           val.saveIDs = saveIDs;
           val.recordIDs = recordIDs;
+          console.log("program() saveIDs.length=" + saveIDs.length);
+          console.log("program() recordIDs.length=" + recordIDs.length);
           resume(err, val);
         }
       });
@@ -669,7 +671,6 @@ export let compiler = (function () {
             });
           };
         }, (ids) => {
-          console.log("compile() ids.length=" + ids.length);
           // Got codeIDs for children of current node. Now create a map of
           // saveIDs and codeIDs.
           let idMap = [];
@@ -692,7 +693,6 @@ export let compiler = (function () {
             }
           });
           putData(idMap, (id) => {
-            console.log("putData() id=" + id);
             // Compile idMap using L113 and store its ID.
             node.link = id;
             node.index = index;
