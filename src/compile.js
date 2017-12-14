@@ -568,6 +568,7 @@ let render = (function() {
         resume({});
       }
       function fn (obj, resume) {
+        // Recursively build the object tree.
         if (typeof obj !== "object") {
           resume({
             id: itemID,

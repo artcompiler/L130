@@ -637,40 +637,41 @@ window.gcexports.viewer = function () {
         });
         if (d.data.value.link) {
           if (window.parent.gcexports.language === "L100") {
-            window.gcexports.dispatcher.dispatch({
-              "L100": {
-                data: {
-                  "generator": {
-                    langID: 132,
-                    codeID: 530171,
-                    dataID: d.data.value.link
-                  }
-                },
-                recompileCode: true
-              }
-            });
+            var state = {};
+            state[window.parent.gcexports.id] = {
+              data: {
+                "generator": {
+                  langID: 132,
+                  codeID: 530171,
+                  dataID: d.data.value.link
+                }
+              },
+              recompileCode: true
+            };
+            window.gcexports.dispatcher.dispatch(state);
           } else {
             window.open("/form?id=7vWiozKxsO+" + d.data.value.link, "/lang?id=132");
           }
         } else if (d.data.value.id) {
           if (false && window.parent.gcexports.language === "L100") {
-            window.gcexports.dispatcher.dispatch({
-              "L100": {
-                data: {
-                  "generator": {
-                    langID: 122,
-                    codeID: d.data.value.id,
-                    dataID: 0
-                  }
-                },
-                recompileCode: true
-              }
-            });
+            var _state = {};
+            _state[window.parent.gcexports.id] = {
+              data: {
+                "generator": {
+                  langID: 122,
+                  codeID: d.data.value.id,
+                  dataID: 0
+                }
+              },
+              recompileCode: true
+            };
+            window.gcexports.dispatcher.dispatch(_state);
           } else {
             var dataIDs = window.gcexports.decodeID("vwbHbKv4Sg"); // show archive view
             var ids = [122, +d.data.value.id].concat(dataIDs);
             var id = window.gcexports.encodeID(ids);
-            window.open("/item?id=" + id + "&archive=true", "/lang?id=122");
+            window.open("/form?id=" + id, "/lang?id=122");
+            //            window.open("/item?id=" + id + "&archive=true", "/lang?id=122");
           }
         }
       }
