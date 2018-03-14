@@ -368,7 +368,6 @@ let transform = (function() {
           console.log("ERROR err=" + err);
           resume(err, null);
         } else {
-          console.log("program() items.length=" + items.length);
           // L131 query for L131 entries
           let saveIDs = {};
           let recordIDs = {};
@@ -390,8 +389,6 @@ let transform = (function() {
           });
           val.saveIDs = saveIDs;
           val.recordIDs = recordIDs;
-          console.log("program() saveIDs.length=" + Object.keys(saveIDs).length);
-          console.log("program() recordIDs.length=" + Object.keys(recordIDs).length);
           resume(err, val);
         }
       });
