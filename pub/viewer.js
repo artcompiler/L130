@@ -684,11 +684,16 @@ window.gcexports.viewer = function () {
       var elts = []; //render.call(this, this.ui, props, this.dirty);
       return React.createElement(
         "div",
-        { className: "section" },
+        null,
+        React.createElement("link", { rel: "stylesheet", href: "https://l000.artcompiler.com/style.css" }),
         React.createElement(
           "div",
-          { className: "container" },
-          elts
+          { className: "L130 section" },
+          React.createElement(
+            "div",
+            { className: "container" },
+            elts
+          )
         )
       );
     }

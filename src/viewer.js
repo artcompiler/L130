@@ -603,9 +603,12 @@ window.gcexports.viewer = (function () {
       let props = this.props;
       var elts = []; //render.call(this, this.ui, props, this.dirty);
       return (
-        <div className="section">
+        <div>
+          <link rel="stylesheet" href="https://l000.artcompiler.com/style.css" />
+          <div className="L130 section">
           <div className="container">
             {elts}
+          </div>
           </div>
         </div>
       );
