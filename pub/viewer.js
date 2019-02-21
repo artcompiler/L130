@@ -577,7 +577,7 @@ window.gcexports.viewer = function () {
       }).attr("height", function (d) {
         return isVert ? getHeight(d.data.key) : getHeight(d.data.key);
       }).attr("href", function (d) {
-        var href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
+        var href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key.replace(/#/g, "%23"));
         return href;
       }).style("opacity", function (d) {
         return isVert ? getWidth(d.data.key) > d.x1 - d.x0 || getHeight(d.data.key) > d.y1 - d.y0 ? 0 : 1 : getWidth(d.data.key) > d.y1 - d.y0 || getHeight(d.data.key) > d.x1 - d.x0 ? 0 : 1;

@@ -465,7 +465,7 @@ window.gcexports.viewer = (function () {
           return isVert ? getHeight(d.data.key) : getHeight(d.data.key);
         })
         .attr("href", (d) => {
-          let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key);
+          let href = "data:image/svg+xml;utf8," + unescapeXML(d.data.key.replace(/#/g, "%23"));
           return href;
         })
         .style("opacity", function(d) {
